@@ -1,0 +1,139 @@
+{% extends 'base.html.twig' %}
+
+{% set active_page = 'etudiant-candidatures' %}
+
+{% block title %}Mes Candidatures - Dépi'Stage{% endblock %}
+{% block description %}Suivez l'état de vos candidatures sur Dépi'Stage.{% endblock %}
+
+{% block content %}
+    <section class="section">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">Mes Candidatures</h1>
+                <p class="page-subtitle">Retrouvez les offres auxquelles vous avez postulé</p>
+            </div>
+
+            {% if success %}
+                <div class="alert alert-info" style="background: #efe; color: #060; border-color: #cec; margin-bottom: 24px;">
+                    {{ success }}
+                </div>
+            {% endif %}
+
+            {% if candidatures is not empty %}
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Offre</th>
+                                <th>Entreprise</th>
+                                <th>Date</th>
+                                <th>Documents (CV / LM)</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in candidatures %}
+                                <tr>
+                                    <td>{{ c.offre_titre }}</td>
+                                    <td>{{ c.entreprise_nom }}</td>
+                                    <td>{{ c.date_candidature|date('d/m/Y') }}</td>
+                                    <td class="documents-cell">
+                                        {% if c.cv_path %}
+                                            <a href="{{ c.cv_path }}" target="_blank" rel="noopener" class="btn btn-outline btn-sm" download>📄 Mon CV</a>
+                                        {% else %}
+                                            <span class="doc-missing">Pas de CV</span>
+                                        {% endif %}
+                                        {% if c.lettre_motivation %}
+                                            <button class="btn btn-outline btn-sm lm-toggle" data-lm-id="lm-{{ c.id }}">📝 Ma LM</button>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if c.statut == 'en_attente' %}
+                                            <span class="status status-pending">En cours</span>
+                                        {% elseif c.statut == 'acceptee' %}
+                                            <span class="status status-accepted">Acceptée</span>
+                                        {% elseif c.statut == 'refusee' %}
+                                            <span class="status status-rejected">Refusée</span>
+                                        {% endif %}
+                                    </td>
+                                    <td><a href="/offre/{{ c.offre_id }}" class="btn btn-dark btn-sm">Voir offre</a></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {# Pagination #}
+                {% if pagination.pages > 1 %}
+                    <div class="pagination">
+                        {% if pagination.current_page > 1 %}
+                            <a href="/etudiant/candidatures?page={{ pagination.current_page - 1 }}" class="pagination-btn">&lsaquo;</a>
+                        {% else %}
+                            <span class="pagination-btn disabled">&lsaquo;</span>
+                        {% endif %}
+                        {% for i in 1..pagination.pages %}
+                            <a href="/etudiant/candidatures?page={{ i }}" class="pagination-btn{% if i == pagination.current_page %} active{% endif %}">{{ i }}</a>
+                        {% endfor %}
+                        {% if pagination.current_page < pagination.pages %}
+                            <a href="/etudiant/candidatures?page={{ pagination.current_page + 1 }}" class="pagination-btn">&rsaquo;</a>
+                        {% else %}
+                            <span class="pagination-btn disabled">&rsaquo;</span>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
+                    <p style="font-size: 1.1rem;">Vous n'avez pas encore de candidature.</p>
+                    <a href="/offres" class="btn btn-primary" style="margin-top: 16px;">Voir les offres</a>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    {# Conteneurs cachés pour les lettres de motivation #}
+    {% if candidatures is not empty %}
+        {% for c in candidatures %}
+            {% if c.lettre_motivation %}
+                <div class="lm-data" id="lm-{{ c.id }}" style="display:none;">{{ c.lettre_motivation }}</div>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+
+    {# Modal LM #}
+    <div class="modal-overlay" id="lm-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📝 Lettre de Motivation</h3>
+                <button class="modal-close" id="modal-close">&times;</button>
+            </div>
+            <div class="modal-body lm-content" id="lm-modal-body"></div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const modal = document.getElementById('lm-modal');
+        const modalBody = document.getElementById('lm-modal-body');
+        const modalClose = document.getElementById('modal-close');
+
+        document.querySelectorAll('.lm-toggle').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var lmId = this.dataset.lmId;
+                var data = document.getElementById(lmId);
+                if (data) {
+                    modalBody.textContent = data.textContent;
+                    modal.classList.add('show');
+                }
+            });
+        });
+
+        if (modalClose) {
+            modalClose.addEventListener('click', function() { modal.classList.remove('show'); });
+        }
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) modal.classList.remove('show');
+        });
+    });
+    </script>
+{% endblock %}
