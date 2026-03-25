@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Accès refusé - Dépi'Stage{% endblock %}
+{% block description %}Vous n'avez pas les droits nécessaires pour accéder à cette page.{% endblock %}
+
+{% block content %}
+    <section class="section">
+        <div class="container error-page">
+            <div class="error-illustration">
+                <div class="error-code">403</div>
+                <div class="error-visual">
+                    <div class="error-circle error-circle-red"></div>
+                    <div class="error-lock">&#128274;</div>
+                </div>
+            </div>
+            <h1 class="error-title">Accès refusé</h1>
+            <p class="error-message">
+                Vous n'avez pas les droits nécessaires pour accéder à cette page.<br>
+                Si vous pensez qu'il s'agit d'une erreur, contactez votre pilote de promotion.
+            </p>
+            <div class="error-actions">
+                <a href="/" class="btn btn-primary btn-lg">Retour à l'accueil</a>
+                <a href="/offres" class="btn btn-outline btn-lg">Voir les offres</a>
+            </div>
+        </div>
+    </section>
+{% endblock %}

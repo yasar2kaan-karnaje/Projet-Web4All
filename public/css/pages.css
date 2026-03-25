@@ -1,0 +1,590 @@
+/* =============================================
+   PAGES.CSS - Correctifs QA et composants additionnels
+   ============================================= */
+
+/* ===========================================
+   1. CARROUSEL STATISTIQUES (SFx 11)
+   =========================================== */
+.stats-carousel-container {
+    position: relative;
+    margin-bottom: 32px;
+    padding: 0 48px;
+}
+
+.carousel-viewport {
+    overflow: hidden;
+    border-radius: var(--radius-xl);
+}
+
+.carousel-track {
+    display: flex;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+}
+
+.carousel-slide {
+    min-width: 100%;
+    flex-shrink: 0;
+    padding: 4px;
+}
+
+.carousel-card {
+    min-height: 140px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.carousel-card ul {
+    text-align: left;
+    list-style: disc;
+}
+
+.carousel-card ul li {
+    margin-bottom: 4px;
+}
+
+/* Arrows */
+.carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-60%);
+    z-index: 10;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    background: var(--bg-primary);
+    border: 2px solid var(--border-color);
+    color: var(--text-primary);
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    box-shadow: var(--shadow-sm);
+    line-height: 1;
+}
+
+.carousel-arrow:hover {
+    background: var(--primary);
+    border-color: var(--primary);
+    box-shadow: var(--shadow-yellow);
+    transform: translateY(-60%) scale(1.1);
+}
+
+.carousel-prev {
+    left: 0;
+}
+
+.carousel-next {
+    right: 0;
+}
+
+/* Dots */
+.carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.carousel-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: var(--radius-full);
+    background: var(--border-color);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.carousel-dot:hover {
+    background: var(--primary-dark);
+    transform: scale(1.2);
+}
+
+.carousel-dot.active {
+    background: var(--primary);
+    width: 28px;
+    border-radius: 5px;
+}
+
+@media (max-width: 640px) {
+    .stats-carousel-container {
+        padding: 0 36px;
+    }
+    .carousel-arrow {
+        width: 32px;
+        height: 32px;
+        font-size: 1.2rem;
+    }
+}
+
+/* ===========================================
+   2. MENU UTILISATEUR / MON PROFIL
+   =========================================== */
+.user-menu {
+    position: relative;
+}
+
+.user-menu-toggle {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px 6px 6px;
+    background: var(--bg-tertiary);
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    font-weight: 500;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+}
+
+.user-menu-toggle:hover {
+    border-color: var(--primary);
+    background: var(--primary-glow);
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-full);
+    background: var(--primary);
+    color: var(--black);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.user-name {
+    color: var(--text-primary);
+}
+
+.user-dropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    min-width: 260px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-xl);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: all var(--transition-base);
+    z-index: 1001;
+    overflow: hidden;
+}
+
+.user-dropdown.show {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.user-dropdown-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+}
+
+.user-dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    transition: all var(--transition-fast);
+    text-decoration: none;
+}
+
+.user-dropdown-item:hover {
+    background: var(--bg-tertiary);
+    color: var(--primary-dark);
+}
+
+.user-dropdown-logout {
+    border-top: 1px solid var(--border-color);
+    color: var(--error);
+}
+
+.user-dropdown-logout:hover {
+    background: rgba(244, 67, 54, 0.08);
+    color: var(--error);
+}
+
+@media (max-width: 768px) {
+    .user-name {
+        display: none;
+    }
+    .user-menu-toggle {
+        padding: 4px;
+    }
+}
+
+/* ===========================================
+   3. MODAL (Lettre de Motivation)
+   =========================================== */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: all var(--transition-base);
+    padding: 20px;
+}
+
+.modal-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.modal-content {
+    background: var(--bg-primary);
+    border-radius: var(--radius-xl);
+    max-width: 640px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-xl);
+    transform: scale(0.95) translateY(10px);
+    transition: transform var(--transition-base);
+}
+
+.modal-overlay.show .modal-content {
+    transform: scale(1) translateY(0);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.modal-header h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    border: none;
+    padding: 0;
+}
+
+.modal-close {
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-full);
+    background: var(--bg-tertiary);
+    border: 1px solid var(--border-color);
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    color: var(--text-secondary);
+}
+
+.modal-close:hover {
+    background: var(--error);
+    color: var(--white);
+    border-color: var(--error);
+}
+
+.modal-body {
+    padding: 24px;
+    white-space: pre-wrap;
+    line-height: 1.8;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+}
+
+/* Documents cell */
+.documents-cell {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.doc-missing {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    font-style: italic;
+}
+
+/* ===========================================
+   4. PAGE D'ERREUR 500
+   =========================================== */
+.error-page {
+    text-align: center;
+    padding: 80px 20px;
+    max-width: 580px;
+    margin: 0 auto;
+}
+
+.error-icon {
+    font-size: 4rem;
+    margin-bottom: 16px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.error-code {
+    font-size: 6rem;
+    font-weight: 800;
+    color: var(--primary);
+    line-height: 1;
+    margin-bottom: 8px;
+    text-shadow: 0 4px 20px var(--primary-glow);
+}
+
+.error-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+}
+
+.error-message {
+    font-size: 1.05rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+    margin-bottom: 32px;
+}
+
+.error-actions {
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 32px;
+}
+
+.error-hint {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+
+/* ===========================================
+   5. PAGINATION - Correctifs
+   =========================================== */
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 40px;
+    flex-wrap: wrap;
+}
+
+.pagination-btn {
+    min-width: 44px;
+    height: 44px;
+    padding: 0 8px;
+    border-radius: var(--radius-md);
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-primary);
+    transition: all var(--transition-fast);
+    text-decoration: none;
+}
+
+.pagination-btn:hover:not(.disabled):not(.active) {
+    border-color: var(--primary);
+    background: var(--primary-glow);
+    transform: translateY(-2px);
+}
+
+.pagination-btn.active {
+    background: var(--primary);
+    border-color: var(--primary);
+    font-weight: 700;
+    color: var(--black);
+    box-shadow: var(--shadow-yellow);
+}
+
+.pagination-btn.disabled {
+    color: var(--text-muted);
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
+/* ===========================================
+   6. CORRECTIFS D'ESPACEMENT (Aération)
+   =========================================== */
+
+/* Espacement global des paragraphes et textes */
+p {
+    margin-bottom: 12px;
+}
+
+p:last-child {
+    margin-bottom: 0;
+}
+
+/* Aération des sections */
+.detail-section p {
+    margin-bottom: 12px;
+    line-height: 1.7;
+}
+
+/* Espacement des blocs de la page de détail */
+.detail-header {
+    margin-bottom: 28px;
+}
+
+.detail-meta-item {
+    margin-bottom: 8px;
+}
+
+/* Aération dans les cards */
+.offer-card {
+    padding: 24px;
+}
+
+.offer-card p {
+    line-height: 1.6;
+    margin-bottom: 16px;
+}
+
+/* Espacement dans les tableaux */
+.table th,
+.table td {
+    padding: 14px 18px;
+}
+
+/* Aération entre les éléments de formulaire */
+.form-group {
+    margin-bottom: 24px;
+}
+
+/* Espacement dans les stat-cards */
+.stat-card {
+    padding: 24px 20px;
+}
+
+.stat-number {
+    margin-bottom: 10px;
+}
+
+/* Grille des entreprises - aération */
+.entreprises-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 24px;
+    margin-top: 24px;
+}
+
+.entreprise-card {
+    padding: 28px 20px;
+}
+
+.entreprise-name {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+}
+
+.entreprise-sector {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+}
+
+.entreprise-stats {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+}
+
+.entreprise-stat-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--primary-dark);
+}
+
+.entreprise-stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    letter-spacing: 0.3px;
+}
+
+/* Page header aération */
+.page-header {
+    margin-bottom: 40px;
+}
+
+.page-title {
+    margin-bottom: 10px;
+}
+
+.page-subtitle {
+    color: var(--text-secondary);
+    font-size: 1.05rem;
+}
+
+/* Search bar aération */
+.search-bar {
+    margin-bottom: 32px;
+    padding: 20px;
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-xl);
+}
+
+/* Alert aération */
+.alert {
+    margin-bottom: 28px;
+}
+
+/* Liste des candidatures - espacement des boutons */
+.candidature-card {
+    margin-bottom: 12px;
+}
+
+/* Section padding sur différentes tailles */
+@media (max-width: 768px) {
+    .section {
+        padding: 48px 0;
+    }
+    
+    .error-code {
+        font-size: 4rem;
+    }
+    
+    .error-page {
+        padding: 48px 16px;
+    }
+
+    .documents-cell {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
