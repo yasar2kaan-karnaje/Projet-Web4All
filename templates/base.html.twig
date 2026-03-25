@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Dépi'Stage{% endblock %}</title>
+    <meta name="description" content="{% block description %}Dépi'Stage - Plateforme de recherche de stages pour étudiants CESI{% endblock %}">
+    <link rel="icon" type="image/png" href="/logo/depistage.png">
+    <link rel="stylesheet" href="/css/styles.css">
+    <link rel="stylesheet" href="/css/components.css">
+    <link rel="stylesheet" href="/css/home.css">
+    <link rel="stylesheet" href="/css/login.css">
+    <link rel="stylesheet" href="/css/offres.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/cookies.css">
+    <link rel="stylesheet" href="/css/pages.css">
+</head>
+
+<body>
+    <header class="header">
+        <div class="header-inner">
+            <a href="/" class="logo">
+                <div class="logo-icon">
+                    <img src="/logo/depistage.png" alt="Dépi'Stage Logo">
+                </div>
+                <div class="logo-text">
+                    <span class="brand-name">Dépi'Stage</span>
+                </div>
+            </a>
+
+            <nav class="nav-desktop">
+                <ul>
+                    <li><a href="/offres" class="nav-link">Offres de stage</a></li>
+                    <li><a href="/entreprises" class="nav-link">Entreprises</a></li>
+                </ul>
+            </nav>
+
+            <div class="header-actions">
+                <a href="/login" class="btn-connexion">CONNEXION</a>
+                <button class="burger-menu" id="burger-menu" aria-label="Menu">
+                    <span class="burger-line"></span>
+                    <span class="burger-line"></span>
+                    <span class="burger-line"></span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <a href="/" class="logo">
+                        <div class="logo-icon">
+                            <img src="/logo/depistage.png" alt="Dépi'Stage Logo">
+                        </div>
+                        <span>Dépi'Stage</span>
+                    </a>
+                    <p class="footer-text">Sans stage, t'es au chômage ! La plateforme de référence pour trouver votre stage idéal.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="footer-column">
+                        <h4>Navigation</h4>
+                        <ul>
+                            <li><a href="/">Accueil</a></li>
+                            <li><a href="/offres">Offres</a></li>
+                            <li><a href="/entreprises">Entreprises</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p class="footer-copy">&copy; 2026 Dépi'Stage - CESI. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const burgerMenu = document.getElementById('burger-menu');
+            const navDesktop = document.querySelector('.nav-desktop');
+            if(burgerMenu) {
+                burgerMenu.addEventListener('click', function() {
+                    navDesktop.classList.toggle('active');
+                    burgerMenu.classList.toggle('open');
+                });
+            }
+        });
+    </script>
+</body>
+
+</html>
