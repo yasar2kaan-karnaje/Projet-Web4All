@@ -1,0 +1,70 @@
+/* Hero */
+.hero {
+    background: var(--gradient-dark);
+    padding: 120px 24px 80px;
+    position: relative;
+    text-align: center;
+    color: var(--white);
+}
+
+.hero-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 16px;
+}
+
+.hero-title span {
+    color: var(--primary);
+}
+
+.hero-subtitle {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 40px;
+}
+
+@media(min-width:768px) {
+    .hero-title {
+        font-size: 3.5rem;
+    }
+}
+
+/* Search Box */
+.search-box {
+    background: var(--bg-primary);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    box-shadow: var(--shadow-xl);
+    border: 1px solid var(--border-color);
+    max-width: 800px;
+    margin: 0 auto;
+    color: var(--text-primary);
+}
+
+.search-box-inline {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+@media(min-width:768px) {
+    .search-box-inline {
+        flex-direction: row;
+        align-items: flex-end;
+    }
+
+    .search-box-inline .form-group {
+        flex: 1;
+        margin: 0;
+    }
+}
+
+.search-bar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 24px;
+}
+
+.search-bar .form-input {
+    flex: 1;
+}

@@ -1,0 +1,186 @@
+{% extends 'base.html.twig' %}
+
+{% set active_page = 'offres' %}
+
+{% block title %}Offres de stage - Dépi'Stage{% endblock %}
+{% block description %}Découvrez toutes les offres de stage disponibles sur Dépi'Stage.{% endblock %}
+
+{% block content %}
+    {# Barre de recherche #}
+    <div class="hero">
+        <div class="hero-content">
+            <div class="search-box">
+                <form action="/offres" method="get" class="search-box-inline">
+                    <div class="form-group" style="flex: 2;">
+                        <input type="text" name="q" class="form-input" placeholder="Rechercher un stage, une entreprise ou une ville..." value="{{ search }}">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg">RECHERCHER</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <section class="section" style="padding-top: 40px;">
+        <div class="container">
+            {# Carrousel statistiques (SFx11 - vrai carrousel avec navigation) #}
+            <div class="stats-carousel-container" id="stats-carousel">
+                <button class="carousel-arrow carousel-prev" id="carousel-prev" aria-label="Précédent">&#8249;</button>
+                <div class="carousel-viewport">
+                    <div class="carousel-track" id="carousel-track">
+                        
+                        <div class="carousel-slide">
+                            <div class="stat-card carousel-card">
+                                <div class="stat-number" style="color: var(--primary);">{{ stats.total }}</div>
+                                <div class="stat-label">Offres disponibles</div>
+                            </div>
+                        </div>
+                        
+                        <div class="carousel-slide">
+                            <div class="stat-card carousel-card">
+                                <div class="stat-number" style="color: var(--primary);">{{ stats.avg_candidatures }}</div>
+                                <div class="stat-label">Candidatures moy./offre</div>
+                            </div>
+                        </div>
+
+                        <div class="carousel-slide">
+                            <div class="stat-card carousel-card">
+                                <div class="stat-label" style="font-weight: 600; margin-bottom: 8px;">Top Wish-list</div>
+                                <ul style="padding-left: 20px; font-size: 0.9rem; color: var(--text-color);">
+                                    {% for top in stats.top_wishlist %}
+                                        <li>{{ top.titre|slice(0,30) }}{% if top.titre|length > 30 %}...{% endif %} ({{ top.nb }})</li>
+                                    {% else %}
+                                        <li>Aucune offre en wish-list</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="carousel-slide">
+                            <div class="stat-card carousel-card">
+                                <div class="stat-label" style="font-weight: 600; margin-bottom: 8px;">Répartition par durée</div>
+                                <ul style="padding-left: 20px; font-size: 0.9rem; color: var(--text-color);">
+                                    {% for rep in stats.repartition_duree %}
+                                        <li>{{ rep.duree }} : {{ rep.nb }} offre(s)</li>
+                                    {% else %}
+                                        <li>Données insuffisantes</li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <button class="carousel-arrow carousel-next" id="carousel-next" aria-label="Suivant">&#8250;</button>
+                <div class="carousel-dots" id="carousel-dots">
+                    <span class="carousel-dot active" data-index="0"></span>
+                    <span class="carousel-dot" data-index="1"></span>
+                    <span class="carousel-dot" data-index="2"></span>
+                    <span class="carousel-dot" data-index="3"></span>
+                </div>
+            </div>
+
+            <script>
+            (function() {
+                const track = document.getElementById('carousel-track');
+                const slides = track.querySelectorAll('.carousel-slide');
+                const prevBtn = document.getElementById('carousel-prev');
+                const nextBtn = document.getElementById('carousel-next');
+                const dots = document.querySelectorAll('.carousel-dot');
+                let current = 0;
+                const total = slides.length;
+                let autoPlayTimer;
+
+                function goTo(index) {
+                    if (index < 0) index = total - 1;
+                    if (index >= total) index = 0;
+                    current = index;
+                    track.style.transform = 'translateX(-' + (current * 100) + '%)';
+                    dots.forEach(function(d, i) {
+                        d.classList.toggle('active', i === current);
+                    });
+                }
+
+                prevBtn.addEventListener('click', function() { goTo(current - 1); resetAutoPlay(); });
+                nextBtn.addEventListener('click', function() { goTo(current + 1); resetAutoPlay(); });
+                dots.forEach(function(dot) {
+                    dot.addEventListener('click', function() { goTo(parseInt(this.dataset.index)); resetAutoPlay(); });
+                });
+
+                function resetAutoPlay() {
+                    clearInterval(autoPlayTimer);
+                    autoPlayTimer = setInterval(function() { goTo(current + 1); }, 5000);
+                }
+                resetAutoPlay();
+            })();
+            </script>
+
+            {# Grille des offres #}
+            {% if offres is not empty %}
+                <div class="grid grid-3">
+                    {% for offre in offres %}
+                        <div class="offer-card">
+                            <div class="offer-card-header">
+                                <div>
+                                    <div class="offer-title">{{ offre.titre }}</div>
+                                    <div class="offer-company">{{ offre.entreprise_nom }}</div>
+                                </div>
+                                {% if is_logged_in and role == 'etudiant' %}
+                                    {% if offre.id in wishlist_ids %}
+                                        <form action="/wishlist/remove" method="post" style="display:inline;">
+                                            <input type="hidden" name="offre_id" value="{{ offre.id }}">
+                                            <input type="hidden" name="redirect" value="/offres?q={{ search }}&page={{ pagination.current_page }}">
+                                            <button type="submit" class="wishlist-btn active" title="Retirer de la wishlist">&#9829;</button>
+                                        </form>
+                                    {% else %}
+                                        <form action="/wishlist/add" method="post" style="display:inline;">
+                                            <input type="hidden" name="offre_id" value="{{ offre.id }}">
+                                            <input type="hidden" name="redirect" value="/offres?q={{ search }}&page={{ pagination.current_page }}">
+                                            <button type="submit" class="wishlist-btn" title="Ajouter à la wishlist">&#9825;</button>
+                                        </form>
+                                    {% endif %}
+                                {% endif %}
+                            </div>
+                            <div class="offer-tags">
+                                {% if offre.lieu %}<span class="tag">{{ offre.lieu }}</span>{% endif %}
+                                {% if offre.duree %}<span class="tag">{{ offre.duree }}</span>{% endif %}
+                            </div>
+                            {% if offre.description %}
+                                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">
+                                    {{ offre.description|length > 120 ? offre.description|slice(0, 120) ~ '...' : offre.description }}
+                                </p>
+                            {% endif %}
+                            <div class="offer-card-footer">
+                                <a href="/offre/{{ offre.id }}" class="btn btn-dark btn-sm">Voir l'offre</a>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                {# Pagination #}
+                {% if pagination.pages > 1 %}
+                    <div class="pagination">
+                        {% if pagination.current_page > 1 %}
+                            <a href="/offres?q={{ search }}&page={{ pagination.current_page - 1 }}" class="pagination-btn">&lsaquo;</a>
+                        {% else %}
+                            <span class="pagination-btn disabled">&lsaquo;</span>
+                        {% endif %}
+
+                        {% for i in 1..pagination.pages %}
+                            <a href="/offres?q={{ search }}&page={{ i }}" class="pagination-btn{% if i == pagination.current_page %} active{% endif %}">{{ i }}</a>
+                        {% endfor %}
+
+                        {% if pagination.current_page < pagination.pages %}
+                            <a href="/offres?q={{ search }}&page={{ pagination.current_page + 1 }}" class="pagination-btn">&rsaquo;</a>
+                        {% else %}
+                            <span class="pagination-btn disabled">&rsaquo;</span>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
+                    <p style="font-size: 1.1rem;">Aucune offre trouvée{% if search %} pour « {{ search }} »{% endif %}.</p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+
+{% set active_page = 'mentions' %}
+
+{% block title %}Mentions Légales - Dépi'Stage{% endblock %}
+{% block description %}Mentions légales de la plateforme Dépi'Stage - CESI{% endblock %}
+
+{% block content %}
+    <section class="section">
+        <div class="container">
+            <a href="/" class="back-link">&larr; Retour à l'accueil</a>
+
+            <div class="page-header">
+                <h1 class="page-title">Mentions Légales</h1>
+                <p class="page-subtitle">Conformité réglementaire</p>
+            </div>
+
+            <div class="detail-section">
+                <h3>1. Éditeur du site</h3>
+                <p>
+                    <strong>Dépi'Stage</strong> - Projet Web CESI<br>
+                    Adresse : Campus CESI, France<br>
+                    Email : contact@depistage.cesi.fr<br>
+                    Téléphone : 01 23 45 67 89
+                </p>
+                <p>
+                    <strong>Directeur de la publication :</strong> [Nom du responsable]<br>
+                    <strong>Responsable de la rédaction :</strong> Équipe projet Dépi'Stage
+                </p>
+            </div>
+
+            <div class="detail-section">
+                <h3>2. Hébergement</h3>
+                <p>
+                    Ce site est hébergé par :<br>
+                    <strong>[Nom de l'hébergeur]</strong><br>
+                    Adresse : [Adresse de l'hébergeur]<br>
+                    Téléphone : [Numéro de téléphone]
+                </p>
+            </div>
+
+            <div class="detail-section">
+                <h3>3. Propriété intellectuelle</h3>
+                <p>
+                    L'ensemble de ce site relève de la législation française et internationale sur le droit d'auteur
+                    et la propriété intellectuelle. Tous les droits de reproduction sont réservés.
+                </p>
+            </div>
+
+            <div class="detail-section">
+                <h3>4. Protection des données personnelles (RGPD)</h3>
+                <p>
+                    Conformément au Règlement Général sur la Protection des Données (RGPD - UE 2016/679), vous
+                    disposez d'un droit d'accès, de rectification, de suppression et d'opposition aux données
+                    personnelles vous concernant.
+                </p>
+                <h4>Données collectées</h4>
+                <ul style="margin-left: 20px; margin-bottom: 16px;">
+                    <li>Données d'identification : nom, prénom, email</li>
+                    <li>Données de connexion : identifiants, mot de passe (chiffré)</li>
+                    <li>Données de candidature : CV, lettre de motivation</li>
+                    <li>Données d'utilisation : wishlist, historique des candidatures</li>
+                </ul>
+                <h4>Exercer vos droits</h4>
+                <p>
+                    Pour exercer vos droits ou pour toute question, contactez notre DPO à :
+                    <strong>dpo@cesi.fr</strong>
+                </p>
+            </div>
+
+            <div class="detail-section">
+                <h3>5. Cookies</h3>
+                <p>
+                    Ce site utilise des cookies essentiels pour le fonctionnement de l'authentification
+                    et des sessions.
+                </p>
+            </div>
+
+            <div class="detail-section">
+                <h3>6. Droit applicable</h3>
+                <p>
+                    Le présent site est soumis au droit français.
+                </p>
+                <p><em>Dernière mise à jour : Mars 2026</em></p>
+            </div>
+        </div>
+    </section>
+{% endblock %}

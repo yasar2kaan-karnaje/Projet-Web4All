@@ -1,0 +1,146 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ entreprise.nom }} - Dépi'Stage{% endblock %}
+{% block description %}Fiche entreprise {{ entreprise.nom }} - Dépi'Stage{% endblock %}
+
+{% block content %}
+    <section class="section detail-page">
+        <div class="container">
+            <a href="/entreprises" class="back-link">&larr; Retour aux entreprises</a>
+
+            {# Header Entreprise #}
+            <div class="detail-header">
+                <div class="entreprise-logo" style="width: 100px; height: 100px; font-size: 2.5rem; margin: 0 0 16px 0;">{{ entreprise.nom|first|upper }}</div>
+                <h1 class="detail-title">{{ entreprise.nom }}</h1>
+                <p style="color: var(--text-muted);">{{ entreprise.secteur ?? '' }}</p>
+                <div class="detail-meta">
+                    <div class="detail-meta-item">
+                        <span class="meta-label">Lieu</span>
+                        <span class="meta-sep">:</span>
+                        <span class="meta-value">{{ entreprise.localisation ?? 'Non précisé' }}</span>
+                    </div>
+                    <div class="detail-meta-item">
+                        <span class="meta-label">Taille</span>
+                        <span class="meta-sep">:</span>
+                        <span class="meta-value">{{ entreprise.taille ?? 'Non précisée' }}</span>
+                    </div>
+                    <div class="detail-meta-item">
+                        <span class="meta-label">Note</span>
+                        <span class="meta-sep">:</span>
+                        <span class="meta-value">{{ entreprise.note_moyenne ?? '-' }} / 5</span>
+                    </div>
+                    <div class="detail-meta-item">
+                        <span class="meta-label">Contact</span>
+                        <span class="meta-sep">:</span>
+                        <span class="meta-value">
+                            {% if entreprise.email_contact or entreprise.tel_contact %}
+                                {{ entreprise.email_contact ?? '' }} {{ entreprise.tel_contact ? ' - ' ~ entreprise.tel_contact : '' }}
+                            {% else %}
+                                Non précisé
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            {# Description #}
+            {% if entreprise.description %}
+                <div class="detail-section">
+                    <h3>À propos</h3>
+                    <p>{{ entreprise.description|nl2br }}</p>
+                </div>
+            {% endif %}
+
+            {# Statistiques #}
+            <div class="admin-stats" style="margin-bottom: 32px;">
+                <div class="stat-card">
+                    <div class="stat-number">{{ entreprise.nb_offres }}</div>
+                    <div class="stat-label">Offres actives</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ entreprise.nb_evaluations }}</div>
+                    <div class="stat-label">Évaluations</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ entreprise.note_moyenne ?? '-' }}</div>
+                    <div class="stat-label">Note moyenne</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ entreprise.nb_candidats ?? 0 }}</div>
+                    <div class="stat-label">Candidats intéressés</div>
+                </div>
+            </div>
+
+            {# Offres de l'entreprise #}
+            {% if offres is not empty %}
+                <div class="detail-section">
+                    <h3>Offres de stage actuelles</h3>
+                    <div class="grid grid-2" style="margin-top: 16px;">
+                        {% for offre in offres %}
+                            <div class="offer-card">
+                                <div class="offer-card-header">
+                                    <div>
+                                        <div class="offer-title">{{ offre.titre }}</div>
+                                        <div class="offer-company">{{ entreprise.nom }}</div>
+                                    </div>
+                                </div>
+                                <div class="offer-tags">
+                                    {% if offre.lieu %}<span class="tag">{{ offre.lieu }}</span>{% endif %}
+                                    {% if offre.duree %}<span class="tag">{{ offre.duree }}</span>{% endif %}
+                                </div>
+                                <div class="offer-card-footer">
+                                    <a href="/offre/{{ offre.id }}" class="btn btn-dark btn-sm">Voir l'offre</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {# Formulaire d'évaluation (étudiant/pilote connecté) #}
+            {% if is_logged_in and role == 'pilote' %}
+                <div class="detail-section">
+                    <h3>Évaluer cette entreprise</h3>
+                    <p style="color: var(--text-muted); margin-bottom: 16px;">
+                        Vous avez effectué un stage chez {{ entreprise.nom }} ? Partagez votre expérience !
+                    </p>
+                    <form action="/entreprise/{{ entreprise.id }}/evaluer" method="post">
+                        <div class="form-group">
+                            <label class="form-label">Votre note</label>
+                            <select name="note" class="form-input form-select">
+                                <option value="5">5 - Excellent</option>
+                                <option value="4">4 - Très bien</option>
+                                <option value="3">3 - Bien</option>
+                                <option value="2">2 - Moyen</option>
+                                <option value="1">1 - À éviter</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Votre commentaire</label>
+                            <textarea name="commentaire" class="form-input form-textarea" placeholder="Décrivez votre expérience..."></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Soumettre mon évaluation</button>
+                    </form>
+                </div>
+            {% endif %}
+
+            {# Avis existants #}
+            {% if evaluations is not empty %}
+                <div class="detail-section">
+                    <h3>Avis des anciens stagiaires</h3>
+                    <div style="display: flex; flex-direction: column; gap: 16px; margin-top: 16px;">
+                        {% for eval in evaluations %}
+                            <div class="candidature-card">
+                                <div class="company-logo" style="background: var(--success); color: white;">{{ eval.note }}</div>
+                                <div class="candidature-info">
+                                    <div class="candidature-title">{{ eval.commentaire|length > 50 ? eval.commentaire|slice(0, 50) ~ '...' : eval.commentaire }}</div>
+                                    <div class="candidature-company">Par {{ eval.user_prenom }} {{ eval.user_nom }}</div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}
