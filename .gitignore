@@ -1,0 +1,6 @@
+/vendor/
+.phpunit.result.cache
+*.log
+.env
+config/database.php
+/staging/
