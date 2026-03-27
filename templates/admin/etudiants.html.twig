@@ -1,0 +1,96 @@
+{% extends 'base.html.twig' %}
+
+{% set active_page = 'admin-etudiants' %}
+
+{% block title %}Gestion des Étudiants - Dépi'Stage{% endblock %}
+
+{% block content %}
+    <section class="section">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">Gestion des Étudiants</h1>
+                <p class="page-subtitle">Rechercher, créer, modifier et supprimer des comptes étudiants</p>
+            </div>
+
+            <div class="alert alert-info">
+                <strong>Permissions :</strong> Admin (toutes actions) | Pilote (créer, modifier, voir)
+            </div>
+
+            <div class="search-bar" style="display: flex; justify-content: space-between; align-items: center;">
+                <form action="/admin/etudiants" method="get" style="display: flex; gap: 12px; flex-grow: 1; max-width: 600px;">
+                    <input type="text" name="q" class="form-input" placeholder="Rechercher un étudiant..." value="{{ search }}">
+                    <button type="submit" class="btn btn-primary">Rechercher</button>
+                </form>
+                <a href="/admin/etudiant/creer" class="btn btn-primary" style="background-color: #28a745; border-color: #28a745;">+ Ajouter un étudiant</a>
+            </div>
+
+            {% if etudiants is not empty %}
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th>Email</th>
+                                <th>Promotion</th>
+                                <th>Centre</th>
+                                <th>État Recherche</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for e in etudiants %}
+                                <tr>
+                                    <td>{{ e.nom }}</td>
+                                    <td>{{ e.prenom }}</td>
+                                    <td>{{ e.email }}</td>
+                                    <td>{{ e.promotion ?? '-' }}</td>
+                                    <td>{{ e.centre ?? '-' }}</td>
+                                    <td>
+                                        {% if e.statut_recherche == 'acceptee' %}
+                                            <span class="status status-accepted">Stage validé</span>
+                                        {% elseif e.statut_recherche == 'en_attente' %}
+                                            <span class="status status-pending">En recherche</span>
+                                        {% else %}
+                                            <span class="status" style="background:var(--bg-hover); color:var(--text-muted);">Sans action</span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="display: flex; gap: 8px;">
+                                        <a href="/admin/etudiant/{{ e.id }}" class="btn btn-dark btn-sm">Voir</a>
+                                        <a href="/admin/etudiant/{{ e.id }}/modifier" class="btn btn-outline btn-sm">Modifier</a>
+                                        <form action="/admin/etudiant/{{ e.id }}/supprimer" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet étudiant ?');">
+                                            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                                            <button type="submit" class="btn btn-outline btn-sm" style="color: #dc3545; border-color: #dc3545;">Supprimer</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if pagination.pages > 1 %}
+                    <div class="pagination">
+                        {% if pagination.current_page > 1 %}
+                            <a href="/admin/etudiants?q={{ search }}&page={{ pagination.current_page - 1 }}" class="pagination-btn">&lsaquo;</a>
+                        {% else %}
+                            <span class="pagination-btn disabled">&lsaquo;</span>
+                        {% endif %}
+                        {% for i in 1..pagination.pages %}
+                            <a href="/admin/etudiants?q={{ search }}&page={{ i }}" class="pagination-btn{% if i == pagination.current_page %} active{% endif %}">{{ i }}</a>
+                        {% endfor %}
+                        {% if pagination.current_page < pagination.pages %}
+                            <a href="/admin/etudiants?q={{ search }}&page={{ pagination.current_page + 1 }}" class="pagination-btn">&rsaquo;</a>
+                        {% else %}
+                            <span class="pagination-btn disabled">&rsaquo;</span>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
+                    <p>Aucun étudiant trouvé.</p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

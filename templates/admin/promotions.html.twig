@@ -1,0 +1,89 @@
+{% extends 'base.html.twig' %}
+
+{% set active_page = 'admin-promotions' %}
+
+{% block title %}Gestion des Promotions - Dépi'Stage{% endblock %}
+
+{% block content %}
+    <section class="section">
+        <div class="container">
+            <div class="page-header" style="margin-bottom: 24px;">
+                <h1 class="page-title">Gestion des Promotions</h1>
+                <p class="page-subtitle">Ajouter de nouvelles promotions au référentiel</p>
+            </div>
+
+            <div style="display: flex; gap: 24px;">
+                <!-- Liste des promotions -->
+                <div style="flex: 2;">
+                    <div class="admin-table-container">
+                        <table class="admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Centre CESI</th>
+                                    <th>Nom de la promotion</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for p in promotions %}
+                                    <tr>
+                                        <td>{{ p.centre_nom }}</td>
+                                        <td>{{ p.nom }}</td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="2" style="text-align: center; color: var(--text-muted);">Aucune promotion enregistrée.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Formulaire d'ajout -->
+                <div style="flex: 1; display: flex; flex-direction: column; gap: 24px;">
+                    <form action="/admin/promotion/creer" method="post" style="padding: 24px; background: var(--card-bg); border-radius: 12px; box-shadow: var(--shadow);">
+                        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                        <h3 style="margin-top: 0; margin-bottom: 16px;">Nouvelle promotion</h3>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <label for="centre_id" style="display: block; font-weight: 600; margin-bottom: 8px;">Centre CESI *</label>
+                            {% if session.user.role == 'pilote' %}
+                                <input type="text" class="form-input" value="{{ session.user.centre }}" disabled>
+                                <!-- le contrôleur assignera automatiquement le centre du pilote -->
+                            {% else %}
+                                <select name="centre_id" id="centre_id" class="form-input form-select" required>
+                                    <option value="">-- Choisir un centre --</option>
+                                    {% for c in centres %}
+                                        <option value="{{ c.id }}">{{ c.nom }}</option>
+                                    {% endfor %}
+                                </select>
+                            {% endif %}
+                        </div>
+
+                        <div style="margin-bottom: 24px;">
+                            <label for="nom" style="display: block; font-weight: 600; margin-bottom: 8px;">Nom de la promotion *</label>
+                            <input type="text" id="nom" name="nom" class="form-input" placeholder="Ex: CPI A2 2026" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">Ajouter la promotion</button>
+                    </form>
+
+                    {% if session.user.role == 'admin' %}
+                    <form action="/admin/centre/creer" method="post" style="padding: 24px; background: var(--card-bg); border-radius: 12px; box-shadow: var(--shadow);">
+                        <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                        <h3 style="margin-top: 0; margin-bottom: 8px;">Nouveau Centre CESI</h3>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">Ajouter un nouveau campus géographique.</p>
+
+                        <div style="margin-bottom: 24px;">
+                            <label for="centre_nom" style="display: block; font-weight: 600; margin-bottom: 8px;">Nom du Centre *</label>
+                            <input type="text" id="centre_nom" name="nom" class="form-input" placeholder="Ex: Bordeaux" required>
+                        </div>
+
+                        <button type="submit" class="btn btn-secondary" style="width: 100%;">Créer le centre</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

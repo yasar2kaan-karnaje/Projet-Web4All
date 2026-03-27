@@ -1,0 +1,104 @@
+{% extends 'base.html.twig' %}
+
+{% set active_page = 'admin-pilotes' %}
+
+{% block title %}Gestion des Pilotes - Dépi'Stage{% endblock %}
+
+{% block content %}
+    <section class="section">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">Gestion des Pilotes</h1>
+                <p class="page-subtitle">Rechercher, créer, modifier et supprimer des comptes pilotes</p>
+            </div>
+
+            <div class="alert alert-info">
+                <strong>Permissions :</strong> Cette page est réservée aux administrateurs uniquement.
+            </div>
+
+            <div class="search-bar" style="display: flex; justify-content: space-between; align-items: center;">
+                <form action="/admin/pilotes" method="get" style="display: flex; gap: 12px; flex-grow: 1; max-width: 600px;">
+                    <input type="text" name="q" class="form-input" placeholder="Rechercher un pilote..." value="{{ search }}">
+                    <button type="submit" class="btn btn-primary">Rechercher</button>
+                </form>
+                <a href="/admin/pilote/creer" class="btn btn-primary" style="background-color: #28a745; border-color: #28a745;">+ Ajouter un pilote</a>
+            </div>
+
+            {% if pilotes is not empty %}
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Nom</th>
+                                <th>Prénom</th>
+                                <th>Email</th>
+                                <th>Centre</th>
+                                <th>Promotions</th>
+                                <th>Recruteur</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for p in pilotes %}
+                                <tr>
+                                    <td>{{ p.nom }}</td>
+                                    <td>{{ p.prenom }}</td>
+                                    <td>{{ p.email }}</td>
+                                    <td>{{ p.centre ?? '-' }}</td>
+                                    <td>
+                                        {% if p.promotions_list %}
+                                            {% for promo in p.promotions_list|split(', ') %}
+                                                <span class="tag" style="margin: 2px;">{{ promo }}</span>
+                                            {% endfor %}
+                                        {% else %}
+                                            <span style="color: var(--text-muted);">-</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if p.is_recruteur %}
+                                            <span class="status status-accepted">Recruteur</span>
+                                            {% if p.entreprise_nom %}
+                                                <br><small>{{ p.entreprise_nom }}</small>
+                                            {% endif %}
+                                        {% else %}
+                                            <span style="color: var(--text-muted);">Non</span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="display: flex; gap: 8px;">
+                                        <a href="/admin/pilote/{{ p.id }}/modifier" class="btn btn-outline btn-sm">Modifier</a>
+                                        <form action="/admin/pilote/{{ p.id }}/supprimer" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce pilote ?');">
+                                            <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                                            <button type="submit" class="btn btn-outline btn-sm" style="color: #dc3545; border-color: #dc3545;">Supprimer</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if pagination.pages > 1 %}
+                    <div class="pagination">
+                        {% if pagination.current_page > 1 %}
+                            <a href="/admin/pilotes?q={{ search }}&page={{ pagination.current_page - 1 }}" class="pagination-btn">&lsaquo;</a>
+                        {% else %}
+                            <span class="pagination-btn disabled">&lsaquo;</span>
+                        {% endif %}
+                        {% for i in 1..pagination.pages %}
+                            <a href="/admin/pilotes?q={{ search }}&page={{ i }}" class="pagination-btn{% if i == pagination.current_page %} active{% endif %}">{{ i }}</a>
+                        {% endfor %}
+                        {% if pagination.current_page < pagination.pages %}
+                            <a href="/admin/pilotes?q={{ search }}&page={{ pagination.current_page + 1 }}" class="pagination-btn">&rsaquo;</a>
+                        {% else %}
+                            <span class="pagination-btn disabled">&rsaquo;</span>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
+                    <p>Aucun pilote trouvé.</p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

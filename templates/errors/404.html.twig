@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Page introuvable - Dépi'Stage{% endblock %}
+{% block description %}La page que vous recherchez n'existe pas ou a été déplacée.{% endblock %}
+
+{% block content %}
+    <section class="section">
+        <div class="container error-page">
+            <div class="error-illustration">
+                <div class="error-code">404</div>
+                <div class="error-visual">
+                    <div class="error-circle"></div>
+                    <div class="error-line"></div>
+                </div>
+            </div>
+            <h1 class="error-title">Page introuvable</h1>
+            <p class="error-message">
+                La page que vous recherchez n'existe pas, a été déplacée ou n'est plus disponible.
+            </p>
+            <div class="error-actions">
+                <a href="/" class="btn btn-primary btn-lg">Retour à l'accueil</a>
+                <a href="/offres" class="btn btn-outline btn-lg">Voir les offres</a>
+            </div>
+            <div class="error-suggestions">
+                <p class="error-hint">Quelques suggestions :</p>
+                <ul>
+                    <li>Vérifiez que l'adresse saisie est correcte</li>
+                    <li>Utilisez la barre de navigation pour retrouver votre chemin</li>
+                    <li>Consultez notre <a href="/offres">catalogue d'offres</a></li>
+                </ul>
+            </div>
+        </div>
+    </section>
+{% endblock %}

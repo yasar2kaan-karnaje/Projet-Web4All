@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% set active_page = 'entreprises' %}
+
+{% block title %}Entreprises - Dépi'Stage{% endblock %}
+{% block description %}Découvrez les entreprises partenaires qui proposent des stages sur Dépi'Stage.{% endblock %}
+
+{% block content %}
+    <section class="section">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">Entreprises partenaires</h1>
+                <p class="page-subtitle">Découvrez les entreprises qui proposent des stages</p>
+            </div>
+
+            {# Recherche #}
+            <div class="search-bar">
+                <form action="/entreprises" method="get" style="display: flex; gap: 12px; width: 100%;">
+                    <input type="text" name="q" class="form-input" placeholder="Rechercher une entreprise..." value="{{ search }}">
+                    <input type="text" name="secteur" class="form-input" placeholder="Secteur..." value="{{ secteur }}">
+                    <button type="submit" class="btn btn-primary">Rechercher</button>
+                </form>
+            </div>
+
+            {# Grille entreprises #}
+            {% if entreprises is not empty %}
+                <div class="entreprises-grid">
+                    {% for e in entreprises %}
+                        <a href="/entreprise/{{ e.id }}" class="entreprise-card">
+                            <div class="entreprise-logo">{{ e.nom|first|upper }}</div>
+                            <div class="entreprise-name">{{ e.nom }}</div>
+                            <div class="entreprise-sector">{{ e.secteur ?? 'Non précisé' }}</div>
+                            <div class="entreprise-stats">
+                                <div class="entreprise-stat">
+                                    <div class="entreprise-stat-value">{{ e.nb_offres }}</div>
+                                    <div class="entreprise-stat-label">Offres</div>
+                                </div>
+                                <div class="entreprise-stat">
+                                    <div class="entreprise-stat-value">{{ e.note_moyenne ?? '-' }}</div>
+                                    <div class="entreprise-stat-label">Note</div>
+                                </div>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+
+                {# Pagination #}
+                {% if pagination.pages > 1 %}
+                    <div class="pagination">
+                        {% if pagination.current_page > 1 %}
+                            <a href="/entreprises?q={{ search }}&secteur={{ secteur }}&page={{ pagination.current_page - 1 }}" class="pagination-btn">&lsaquo;</a>
+                        {% else %}
+                            <span class="pagination-btn disabled">&lsaquo;</span>
+                        {% endif %}
+
+                        {% for i in 1..pagination.pages %}
+                            <a href="/entreprises?q={{ search }}&secteur={{ secteur }}&page={{ i }}" class="pagination-btn{% if i == pagination.current_page %} active{% endif %}">{{ i }}</a>
+                        {% endfor %}
+
+                        {% if pagination.current_page < pagination.pages %}
+                            <a href="/entreprises?q={{ search }}&secteur={{ secteur }}&page={{ pagination.current_page + 1 }}" class="pagination-btn">&rsaquo;</a>
+                        {% else %}
+                            <span class="pagination-btn disabled">&rsaquo;</span>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
+                    <p style="font-size: 1.1rem;">Aucune entreprise trouvée{% if search %} pour « {{ search }} »{% endif %}.</p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}
