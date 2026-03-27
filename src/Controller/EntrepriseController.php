@@ -2,49 +2,78 @@
 
 namespace App\Controller;
 
+use App\Model\Entreprise;
+use App\Model\Offre;
+
 class EntrepriseController extends BaseController
 {
-    public function liste()
+    /**
+     * Liste des entreprises (accessible à tous)
+     */
+    public function liste(): void
     {
-        $entreprises = [
-            ['id' => 1, 'nom' => 'TechCorp', 'secteur' => 'IT', 'localisation' => 'Lyon', 'nb_offres' => 5, 'note_moyenne' => 4.2],
-            ['id' => 2, 'nom' => 'DataSoft', 'secteur' => 'Data', 'localisation' => 'Paris', 'nb_offres' => 3, 'note_moyenne' => 3.8],
-        ];
+        $page = (int) $this->getParam('page', 1);
+        $search = $this->getParam('q', '');
+        $secteur = $this->getParam('secteur', '');
+
+        try {
+            $result = Entreprise::findAll($page, 12, $search, $secteur);
+        } catch (\Exception $e) {
+            $result = ['data' => [], 'total' => 0, 'pages' => 0, 'current_page' => 1];
+        }
 
         $this->render('entreprise/liste.html.twig', [
-            'entreprises' => $entreprises,
-            'total' => count($entreprises),
-            'pages' => 1,
-            'current_page' => 1,
-            'active_page' => 'entreprises',
+            'entreprises' => $result['data'],
+            'pagination' => $result,
+            'search' => $search,
+            'secteur' => $secteur,
         ]);
     }
 
-    public function detail(string $id)
+    /**
+     * Détail d'une entreprise
+     */
+    public function detail(string $id): void
     {
-        $entreprise = [
-            'id' => $id,
-            'nom' => 'TechCorp',
-            'secteur' => 'IT / Développement Web',
-            'localisation' => 'Lyon',
-            'description' => 'Entreprise spécialisée dans le développement web.',
-            'nb_offres' => 5,
-            'note_moyenne' => 4.2,
-            'nb_evaluations' => 10,
-        ];
+        try {
+            $entreprise = Entreprise::findById((int) $id);
+            $offres = Offre::findByEntreprise((int) $id);
+            $evaluations = Entreprise::getEvaluations((int) $id);
+        } catch (\Exception $e) {
+            $entreprise = null;
+            $offres = [];
+            $evaluations = [];
+        }
+
+        if (!$entreprise) {
+            http_response_code(404);
+            echo '<h1>Entreprise non trouvée</h1><a href="/entreprises">Retour aux entreprises</a>';
+            return;
+        }
 
         $this->render('entreprise/detail.html.twig', [
             'entreprise' => $entreprise,
-            'offres' => [],
-            'evaluations' => [],
-            'active_page' => 'entreprises',
+            'offres' => $offres,
+            'evaluations' => $evaluations,
         ]);
     }
 
-    public function evaluer(string $id)
+    /**
+     * Évaluer une entreprise (POST)
+     */
+    public function evaluer(string $id): void
     {
-        $this->requireLogin();
-        // TODO: Phase 4
-        $this->redirect('/entreprise/' . $id);
+        $this->requireRole('pilote');
+
+        $note = (int) $this->postParam('note', 3);
+        $commentaire = $this->postParam('commentaire', '');
+
+        try {
+            \App\Model\Entreprise::addEvaluation($_SESSION['user']['id'], (int) $id, $note, $commentaire);
+        } catch (\Exception $e) {
+            // Erreur silencieuse
+        }
+
+        $this->redirect('/entreprise/' . $id . '?success=Évaluation enregistrée');
     }
 }

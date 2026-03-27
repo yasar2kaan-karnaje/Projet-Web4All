@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Model\Offre;
+
 class HomeController extends BaseController
 {
     /**
@@ -9,23 +11,15 @@ class HomeController extends BaseController
      */
     public function index(): void
     {
-        // Données simulées pour la Phase 3
-        $stats = [
-            'nb_offres' => 42,
-            'nb_entreprises' => 15,
-            'nb_etudiants' => 120,
-        ];
-
-        $dernieres_offres = [
-            ['id' => 1, 'titre' => 'Stage Développeur Web', 'entreprise_nom' => 'TechCorp', 'lieu' => 'Lyon'],
-            ['id' => 2, 'titre' => 'Stage Data Analyst', 'entreprise_nom' => 'DataSoft', 'lieu' => 'Paris'],
-            ['id' => 3, 'titre' => 'Stage DevOps', 'entreprise_nom' => 'CloudIO', 'lieu' => 'Bordeaux'],
-        ];
+        $offres = [];
+        try {
+            $offres = Offre::findLatest(3);
+        } catch (\Exception $e) {
+            // La base de données n'est peut-être pas encore configurée
+        }
 
         $this->render('home/dashboard.html.twig', [
-            'stats' => $stats,
-            'latest_offres' => $dernieres_offres,
-            'active_page' => 'home',
+            'latest_offres' => $offres,
         ]);
     }
 }

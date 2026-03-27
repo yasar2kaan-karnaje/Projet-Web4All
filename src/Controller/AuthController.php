@@ -2,39 +2,113 @@
 
 namespace App\Controller;
 
+use App\Model\User;
+
 class AuthController extends BaseController
 {
-    public function loginForm()
+    /**
+     * Affiche le formulaire de connexion
+     */
+    public function loginForm(): void
     {
+        // Si déjà connecté, rediriger selon le rôle
+        if (isset($_SESSION['user'])) {
+            $this->redirectByRole();
+            return;
+        }
+
         $this->render('auth/login.html.twig', [
-            'active_page' => 'login',
+            'error' => $this->getParam('error'),
         ]);
     }
 
-    public function login()
+    /**
+     * Traite la connexion
+     */
+    public function login(): void
     {
         $email = $this->postParam('email', '');
         $password = $this->postParam('password', '');
 
-        // Phase 3 : vérification basique sans BDD
-        if ($email === '' || $password === '') {
-            $this->render('auth/login.html.twig', [
-                'error' => 'Veuillez remplir tous les champs.',
-                'active_page' => 'login',
-            ]);
+        if (empty($email) || empty($password)) {
+            $this->redirect('/login?error=Veuillez remplir tous les champs');
             return;
         }
 
-        // TODO: Phase 4 - Connecter à la BDD avec PDO
-        $this->render('auth/login.html.twig', [
-            'error' => 'Fonctionnalité en cours de développement.',
-            'active_page' => 'login',
-        ]);
+        try {
+            $user = User::verifyPassword($email, $password);
+        } catch (\Exception $e) {
+            $this->redirect('/login?error=Erreur de connexion à la base de données');
+            return;
+        }
+
+        if ($user) {
+            // Stocker l'utilisateur en session (sans le mot de passe)
+            unset($user['password']);
+            $_SESSION['user'] = $user;
+
+            // Création d'un cookie sécurisé chiffré (pas en clair)
+            $tokenData = json_encode(['id' => $user['id'], 'role' => $user['role'], 'time' => time()]);
+            $secretKey = 'DepiStageSecretKey2026'; // Clé secrète (devrait être dans config)
+            $encryptedToken = openssl_encrypt($tokenData, 'AES-128-ECB', $secretKey);
+            // Expiration en fonction du consentement (si refusé, expire avec la session, sinon 30 jours)
+            $cookieConsent = $_COOKIE['cookie_consent'] ?? 'accepted';
+            $expireTime = ($cookieConsent === 'rejected') ? 0 : time() + 86400 * 30; // 0 = session
+            $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+            
+            setcookie('auth_token', $encryptedToken, [
+                'expires' => $expireTime,
+                'path' => '/',
+                'domain' => '',
+                'secure' => $isSecure,
+                'httponly' => true,
+                'samesite' => 'Lax'
+            ]);
+
+            $this->redirectByRole();
+        } else {
+            $this->redirect('/login?error=Email ou mot de passe incorrect');
+        }
     }
 
-    public function logout()
+    /**
+     * Déconnexion
+     */
+    public function logout(): void
     {
+        // Supprimer le cookie
+        $isSecure = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off');
+        setcookie('auth_token', '', [
+            'expires' => time() - 3600,
+            'path' => '/',
+            'domain' => '',
+            'secure' => $isSecure,
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ]);
+
         session_destroy();
-        $this->redirect('/');
+        $this->redirect('/login');
+    }
+
+    /**
+     * Redirige selon le rôle de l'utilisateur
+     */
+    private function redirectByRole(): void
+    {
+        $role = $_SESSION['user']['role'] ?? 'guest';
+        switch ($role) {
+            case 'admin':
+                $this->redirect('/admin');
+                break;
+            case 'pilote':
+                $this->redirect('/pilote/candidatures');
+                break;
+            case 'etudiant':
+                $this->redirect('/');
+                break;
+            default:
+                $this->redirect('/');
+        }
     }
 }
