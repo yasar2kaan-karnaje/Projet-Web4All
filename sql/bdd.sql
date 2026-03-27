@@ -333,15 +333,25 @@ INSERT INTO roles (id, nom, label) VALUES
 INSERT INTO centres (id, nom) VALUES
 (1, 'Paris'), (2, 'Lyon'), (3, 'Bordeaux');
 
--- 4. Création des Entreprises (5 entreprises)
+-- 4. Création des Entreprises (15 entreprises)
 INSERT INTO entreprises (id, nom, secteur, localisation, description) VALUES
 (1, 'TechCorp', 'Informatique', 'Paris', 'ESN leader du marché de la tech.'),
 (2, 'DataForge', 'Data Science', 'Lyon', 'Start-up spécialisée en Intelligence Artificielle.'),
 (3, 'WebMakerZ', 'Web', 'Bordeaux', 'Agence web de création de sites vitrines.'),
 (4, 'SecurIT', 'Cybersécurité', 'Paris', 'Expert en sécurité des systèmes d information.'),
-(5, 'CloudSys', 'Cloud', 'Lyon', 'Hébergement et architecture Cloud.');
+(5, 'CloudSys', 'Cloud', 'Lyon', 'Hébergement et architecture Cloud.'),
+(6, 'GreenEnergy', 'Énergie', 'Nantes', 'Solutions informatiques pour la transition écologique.'),
+(7, 'HealthTech', 'Santé', 'Lille', 'Développement de logiciels pour le milieu hospitalier.'),
+(8, 'FinTech Hub', 'Finance', 'Paris', 'Start-up innovante dans la gestion de patrimoine.'),
+(9, 'AeroDev', 'Aéronautique', 'Toulouse', 'Conception de logiciels embarqués pour l aviation.'),
+(10, 'AutoDrive', 'Automobile', 'Strasbourg', 'Recherche et développement sur les véhicules autonomes.'),
+(11, 'AgriData', 'Agriculture', 'Rennes', 'Analyse de données pour l agriculture connectée.'),
+(12, 'LogistiX', 'Logistique', 'Marseille', 'Optimisation des chaînes d approvisionnement par l IA.'),
+(13, 'EduSmart', 'Éducation', 'Bordeaux', 'Plateforme de e-learning adaptative.'),
+(14, 'RetailSoft', 'E-commerce', 'Paris', 'Solutions ERP pour les grandes enseignes de distribution.'),
+(15, 'GameStudio', 'Jeux Vidéo', 'Montpellier', 'Studio indépendant de développement de jeux.');
 
--- 5. Création des Offres (15 offres : 3 par entreprise)
+-- 5. Création des Offres (15 offres : 3 par entreprise pour les 5 premières)
 INSERT INTO offres (id, titre, description, competences, remuneration, duree, lieu, entreprise_id) VALUES
 (1, 'Dev Fullstack', 'Mission complète web', 'PHP, JS, React', '1200€/mois', '6 mois', 'Paris', 1),
 (2, 'Dev Backend PHP', 'Création API', 'PHP, Laravel', '1000€/mois', '4 mois', 'Paris', 1),
@@ -363,14 +373,14 @@ INSERT INTO offres (id, titre, description, competences, remuneration, duree, li
 
 -- -> Administrateur (1)
 INSERT INTO users (id, nom, prenom, email, password, role_id) VALUES
-(1, 'Admin', 'Super', 'admin@test.fr', '$2y$10$jYP7l0rCpcz5dnpx6ksoKeprETEc2DE4YjEshanfroVqNm46R3xe6', 1);
+(1, 'Admin', 'Super', 'admin@test.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 1);
 INSERT INTO administrateurs (user_id) VALUES (1);
 
 -- -> Pilotes (3)
 INSERT INTO users (id, nom, prenom, email, password, role_id) VALUES
-(2, 'Martin', 'Paul', 'pilote1@cesi.fr', '$2y$10$jYP7l0rCpcz5dnpx6ksoKeprETEc2DE4YjEshanfroVqNm46R3xe6', 2),
-(3, 'Bernard', 'Lucie', 'pilote2@cesi.fr', '$2y$10$jYP7l0rCpcz5dnpx6ksoKeprETEc2DE4YjEshanfroVqNm46R3xe6', 2),
-(4, 'Thomas', 'Marc', 'pilote3@cesi.fr', '$2y$10$jYP7l0rCpcz5dnpx6ksoKeprETEc2DE4YjEshanfroVqNm46R3xe6', 2);
+(2, 'Martin', 'Paul', 'pilote1@cesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 2),
+(3, 'Bernard', 'Lucie', 'pilote2@cesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 2),
+(4, 'Thomas', 'Marc', 'pilote3@cesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 2);
 INSERT INTO pilotes (id, user_id, is_recruteur) VALUES (1, 2, 0), (2, 3, 0), (3, 4, 0);
 
 -- -> Création de 3 promotions, gérées par nos 3 pilotes
@@ -381,20 +391,20 @@ INSERT INTO pilote_promotions (pilote_id, promotion_id) VALUES
 
 -- -> Étudiants (12 - 4 par promotion/pilote)
 INSERT INTO users (id, nom, prenom, email, password, role_id) VALUES
-(11, 'Etu1', 'Jean', 'etu1@viacesi.fr', '$2y$10$jYP7l0rCpcz5dnpx6ksoKeprETEc2DE4YjEshanfroVqNm46R3xe6', 3),
-(12, 'Etu2', 'Marie', 'etu2@viacesi.fr', '$2y$10$jYP7l0rCpcz5dnpx6ksoKeprETEc2DE4YjEshanfroVqNm46R3xe6', 3),
-(13, 'Etu3', 'Pierre', 'etu3@viacesi.fr', '$2y$10$jYP7l0rCpcz5dnpx6ksoKeprETEc2DE4YjEshanfroVqNm46R3xe6', 3),
-(14, 'Etu4', 'Sophie', 'etu4@viacesi.fr', '$2y$10$jYP7l0rCpcz5dnpx6ksoKeprETEc2DE4YjEshanfroVqNm46R3xe6', 3),
+(11, 'Etu1', 'Jean', 'etu1@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
+(12, 'Etu2', 'Marie', 'etu2@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
+(13, 'Etu3', 'Pierre', 'etu3@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
+(14, 'Etu4', 'Sophie', 'etu4@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
 
-(15, 'Etu5', 'Lucas', 'etu5@viacesi.fr', '$2y$10$jYP7l0rCpcz5dnpx6ksoKeprETEc2DE4YjEshanfroVqNm46R3xe6', 3),
-(16, 'Etu6', 'Julie', 'etu6@viacesi.fr', '$2y$10$jYP7l0rCpcz5dnpx6ksoKeprETEc2DE4YjEshanfroVqNm46R3xe6', 3),
-(17, 'Etu7', 'Hugo', 'etu7@viacesi.fr', '$2y$10$jYP7l0rCpcz5dnpx6ksoKeprETEc2DE4YjEshanfroVqNm46R3xe6', 3),
-(18, 'Etu8', 'Chloe', 'etu8@viacesi.fr', '$2y$10$jYP7l0rCpcz5dnpx6ksoKeprETEc2DE4YjEshanfroVqNm46R3xe6', 3),
+(15, 'Etu5', 'Lucas', 'etu5@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
+(16, 'Etu6', 'Julie', 'etu6@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
+(17, 'Etu7', 'Hugo', 'etu7@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
+(18, 'Etu8', 'Chloe', 'etu8@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
 
-(19, 'Etu9', 'Leo', 'etu9@viacesi.fr', '$2y$10$jYP7l0rCpcz5dnpx6ksoKeprETEc2DE4YjEshanfroVqNm46R3xe6', 3),
-(20, 'Etu10', 'Emma', 'etu10@viacesi.fr', '$2y$10$jYP7l0rCpcz5dnpx6ksoKeprETEc2DE4YjEshanfroVqNm46R3xe6', 3),
-(21, 'Etu11', 'Paul', 'etu11@viacesi.fr', '$2y$10$jYP7l0rCpcz5dnpx6ksoKeprETEc2DE4YjEshanfroVqNm46R3xe6', 3),
-(22, 'Etu12', 'Alice', 'etu12@viacesi.fr', '$2y$10$jYP7l0rCpcz5dnpx6ksoKeprETEc2DE4YjEshanfroVqNm46R3xe6', 3);
+(19, 'Etu9', 'Leo', 'etu9@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
+(20, 'Etu10', 'Emma', 'etu10@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
+(21, 'Etu11', 'Paul', 'etu11@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
+(22, 'Etu12', 'Alice', 'etu12@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3);
 
 INSERT INTO etudiants (user_id, promotion) VALUES
 (11, 'A2 Info Paris'), (12, 'A2 Info Paris'), (13, 'A2 Info Paris'), (14, 'A2 Info Paris'),
@@ -421,3 +431,12 @@ INSERT INTO wishlist (user_id, offre_id) VALUES
 (11, 3), (12, 5), (13, 7), (14, 9),
 (15, 11), (16, 13), (17, 15), (18, 2),
 (19, 4), (20, 6), (21, 8), (22, 10);
+
+-- 9. Création des Évaluations (Pilotes et Admin sur au moins 3 entreprises)
+INSERT INTO evaluations (user_id, entreprise_id, note, commentaire) VALUES
+(1, 1, 5, 'Excellente entreprise, très bonne intégration des étudiants et suivi rigoureux.'),
+(2, 1, 4, 'Bon environnement de travail, les missions confiées aux étudiants sont très formatrices.'),
+(3, 2, 5, 'Super start-up, très dynamique sur les sujets Data et Intelligence Artificielle.'),
+(4, 2, 3, 'Bonne ambiance générale mais la charge de travail peut être importante par moments.'),
+(1, 3, 4, 'Agence sérieuse, un cadre parfait pour un premier stage en développement web.'),
+(2, 3, 4, 'Équipe accueillante et de très bons retours de la part des étudiants placés.');
