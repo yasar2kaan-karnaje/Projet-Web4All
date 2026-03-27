@@ -1,0 +1,110 @@
+{% extends 'base.html.twig' %}
+
+{% set active_page = 'admin-etudiants' %}
+
+{% block title %}{{ etudiant.prenom }} {{ etudiant.nom }} - Dépi'Stage{% endblock %}
+
+{% block content %}
+    <section class="section">
+        <div class="container">
+            <a href="/admin/etudiants" class="back-link">&larr; Retour aux étudiants</a>
+
+            <div class="detail-header" style="margin-top: 24px;">
+                <div class="entreprise-logo" style="width: 80px; height: 80px; font-size: 2rem; margin: 0 0 16px 0;">{{ etudiant.prenom|first|upper }}</div>
+                <h1 class="detail-title">{{ etudiant.prenom }} {{ etudiant.nom }}</h1>
+                <p style="color: var(--text-muted);">{{ etudiant.email }}</p>
+                <div class="detail-meta">
+                    <div class="detail-meta-item">
+                        <div class="icon">Centre</div>
+                        <div><div class="value">{{ etudiant.centre ?? 'Non précisé' }}</div></div>
+                    </div>
+                    <div class="detail-meta-item">
+                        <div class="icon">Promotion</div>
+                        <div><div class="value">{{ etudiant.promotion ?? 'Non précisée' }}</div></div>
+                    </div>
+                </div>
+            </div>
+
+            {# Candidatures de l'étudiant #}
+            <div class="detail-section">
+                <h3>Candidatures ({{ candidatures|length }})</h3>
+                {% if candidatures is not empty %}
+                    <div class="table-container">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Offre</th>
+                                    <th>Entreprise</th>
+                                    <th>Date</th>
+                                    <th>CV / LM</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for c in candidatures %}
+                                    <tr>
+                                        <td><a href="/offre/{{ c.offre_id }}">{{ c.offre_titre }}</a></td>
+                                        <td>{{ c.entreprise_nom }}</td>
+                                        <td>{{ c.date_candidature|date('d/m/Y') }}</td>
+                                        <td>
+                                            {% if c.cv_path %}
+                                                <a href="{{ c.cv_path }}" target="_blank" class="btn btn-outline btn-sm">CV</a>
+                                            {% endif %}
+                                            {% if c.lettre_motivation %}
+                                                <button onclick="alert('{{ c.lettre_motivation|escape('js') }}')" class="btn btn-outline btn-sm">LM</button>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if c.statut == 'en_attente' %}
+                                                <span class="status status-pending">En attente</span>
+                                            {% elseif c.statut == 'acceptee' %}
+                                                <span class="status status-accepted">Acceptée</span>
+                                            {% elseif c.statut == 'refusee' %}
+                                                <span class="status status-rejected">Refusée</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <p style="color: var(--text-muted);">Aucune candidature.</p>
+                {% endif %}
+            </div>
+
+            {# Wishlist de l'étudiant #}
+            <div class="detail-section">
+                <h3>Wish-list ({{ wishlist|length }})</h3>
+                {% if wishlist is not empty %}
+                    <div class="grid grid-3" style="margin-top: 16px;">
+                        {% for item in wishlist %}
+                            <div class="offer-card">
+                                <div class="offer-card-header">
+                                    <div>
+                                        <div class="offer-title">{{ item.offre_titre }}</div>
+                                        <div class="offer-company">{{ item.entreprise_nom }}</div>
+                                    </div>
+                                </div>
+                                <div class="offer-tags">
+                                    {% if item.lieu %}<span class="tag">{{ item.lieu }}</span>{% endif %}
+                                    {% if item.duree %}<span class="tag">{{ item.duree }}</span>{% endif %}
+                                </div>
+                                <div class="offer-card-footer">
+                                    <a href="/offre/{{ item.offre_id }}" class="btn btn-dark btn-sm">Voir l'offre</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    <p style="color: var(--text-muted);">Wish-list vide.</p>
+                {% endif %}
+            </div>
+
+            <div style="margin-top: 24px; display: flex; gap: 12px;">
+                <a href="/admin/etudiant/{{ etudiant.id }}/modifier" class="btn btn-primary">Modifier cet étudiant</a>
+                <a href="/admin/etudiants" class="btn btn-outline">Retour à la liste</a>
+            </div>
+        </div>
+    </section>
+{% endblock %}

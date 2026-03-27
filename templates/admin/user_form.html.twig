@@ -1,0 +1,107 @@
+{% extends 'base.html.twig' %}
+
+{% set active_page = type == 'pilote' ? 'admin-pilotes' : 'admin-etudiants' %}
+
+{% block title %}{{ user ? 'Modifier' : 'Ajouter' }} un {{ type|capitalize }} - Dépi'Stage{% endblock %}
+
+{% block content %}
+    <section class="section">
+        <div class="container" style="max-width: 600px;">
+            <a href="/admin/{{ type }}s" class="back-link">&larr; Retour aux {{ type }}s</a>
+            
+            <div class="page-header" style="margin-top: 24px;">
+                <h1 class="page-title">{{ user ? 'Modifier le ' ~ type : 'Nouveau ' ~ type }}</h1>
+            </div>
+
+            <div class="detail-section">
+                <form action="/admin/{{ type }}/{{ user ? user.id ~ '/modifier' : 'creer' }}" method="post" style="display: flex; flex-direction: column; gap: 16px;">
+                    
+                    <div style="display: flex; gap: 16px;">
+                        <div style="flex: 1;">
+                            <label for="nom" style="display: block; font-weight: 600; margin-bottom: 8px;">Nom *</label>
+                            <input type="text" id="nom" name="nom" class="form-input" value="{{ user.nom ?? '' }}" required>
+                        </div>
+                        <div style="flex: 1;">
+                            <label for="prenom" style="display: block; font-weight: 600; margin-bottom: 8px;">Prénom *</label>
+                            <input type="text" id="prenom" name="prenom" class="form-input" value="{{ user.prenom ?? '' }}" required>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="email" style="display: block; font-weight: 600; margin-bottom: 8px;">Email (Login) *</label>
+                        <input type="email" id="email" name="email" class="form-input" value="{{ user.email ?? '' }}" required>
+                    </div>
+
+                    <div>
+                        <label for="password" style="display: block; font-weight: 600; margin-bottom: 8px;">
+                            Mot de passe {{ user ? '<small>(laisser vide pour ne pas modifier)</small>' : '*' }}
+                        </label>
+                        <div style="position: relative;">
+                            <input type="password" id="password" name="password" class="form-input" {{ user ? '' : 'required' }} style="padding-right: 40px;">
+                            <button type="button" onclick="const p=document.getElementById('password'); p.type=p.type==='password'?'text':'password'; this.textContent=p.type==='password'?'👁️':'🔒';" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.2rem;">👁️</button>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 16px;">
+                        <div style="flex: 1;">
+                            <label for="centre" style="display: block; font-weight: 600; margin-bottom: 8px;">Centre CESI {% if type == 'etudiant' %}*{% endif %}</label>
+                            {% if session.user.role == 'pilote' %}
+                                <input type="text" class="form-input" value="{{ session.user.centre }}" disabled>
+                            {% else %}
+                                <select name="centre" id="centre" class="form-input form-select" {% if type == 'etudiant' %}required{% endif %}>
+                                    <option value="">-- Choisir un centre --</option>
+                                    {% for c in all_centres %}
+                                        <option value="{{ c.nom }}" {% if user and user.centre == c.nom %}selected{% endif %}>
+                                            {{ c.nom }}
+                                        </option>
+                                    {% endfor %}
+                                </select>
+                            {% endif %}
+                        </div>
+                        <div style="flex: 1;">
+                            <label for="promotion" style="display: block; font-weight: 600; margin-bottom: 8px;">Promotion {% if type == 'etudiant' %}*{% endif %}</label>
+                            <select name="promotion" id="promotion" class="form-input form-select" {% if type == 'etudiant' %}required{% endif %}>
+                                <option value="">-- Choisir une promotion --</option>
+                                {% for p in all_promotions %}
+                                    <option value="{{ p.nom }}" {% if user and user.promotion == p.nom %}selected{% endif %}
+                                            data-centre="{{ p.centre_nom }}">
+                                        {{ p.nom }} {% if session.user.role != 'pilote' %}({{ p.centre_nom }}){% endif %}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    
+                    {% if session.user.role != 'pilote' %}
+                    <script>
+                        // Filtrer les promotions par centre pour l'admin
+                        document.getElementById('centre').addEventListener('change', function() {
+                            const centreParam = this.value;
+                            const options = document.getElementById('promotion').options;
+                            for (let i = 1; i < options.length; i++) {
+                                if (centreParam === '' || options[i].getAttribute('data-centre') === centreParam) {
+                                    options[i].style.display = 'block';
+                                } else {
+                                    options[i].style.display = 'none';
+                                }
+                            }
+                            document.getElementById('promotion').value = '';
+                        });
+                        
+                        // Déclencher le filtre au chargement
+                        document.getElementById('centre').dispatchEvent(new Event('change'));
+                        {% if user and user.promotion %}
+                            // Restaurer la valeur si édition
+                            document.getElementById('promotion').value = "{{ user.promotion }}";
+                        {% endif %}
+                    </script>
+                    {% endif %}
+
+                    <div style="margin-top: 16px;">
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">{{ user ? 'Enregistrer les modifications' : 'Ajouter le ' ~ type }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+{% endblock %}

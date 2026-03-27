@@ -1,0 +1,145 @@
+{% extends 'base.html.twig' %}
+
+{% set active_page = 'admin-pilotes' %}
+
+{% block title %}{{ user ? 'Modifier' : 'Ajouter' }} un Pilote - Dépi'Stage{% endblock %}
+
+{% block content %}
+    <section class="section">
+        <div class="container" style="max-width: 700px;">
+            <a href="/admin/pilotes" class="back-link">&larr; Retour aux pilotes</a>
+            
+            <div class="page-header" style="margin-top: 24px;">
+                <h1 class="page-title">{{ user ? 'Modifier le pilote' : 'Nouveau pilote' }}</h1>
+                <p class="page-subtitle">Gestion pédagogique & recruteur</p>
+            </div>
+
+            <div class="detail-section">
+                <form action="/admin/pilote/{{ user ? user.id ~ '/modifier' : 'creer' }}" method="post" style="display: flex; flex-direction: column; gap: 20px;">
+                    
+                    {# === IDENTITÉ === #}
+                    <h3 style="margin: 0; padding-bottom: 8px; border-bottom: 2px solid var(--primary-color);">Identité</h3>
+
+                    <div style="display: flex; gap: 16px;">
+                        <div style="flex: 1;">
+                            <label for="nom" style="display: block; font-weight: 600; margin-bottom: 8px;">Nom *</label>
+                            <input type="text" id="nom" name="nom" class="form-input" value="{{ user.nom ?? '' }}" required>
+                        </div>
+                        <div style="flex: 1;">
+                            <label for="prenom" style="display: block; font-weight: 600; margin-bottom: 8px;">Prénom *</label>
+                            <input type="text" id="prenom" name="prenom" class="form-input" value="{{ user.prenom ?? '' }}" required>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="email" style="display: block; font-weight: 600; margin-bottom: 8px;">Email (Login) *</label>
+                        <input type="email" id="email" name="email" class="form-input" value="{{ user.email ?? '' }}" required>
+                    </div>
+
+                    <div>
+                        <label for="password" style="display: block; font-weight: 600; margin-bottom: 8px;">
+                            Mot de passe {{ user ? '<small>(laisser vide pour ne pas modifier)</small>' : '*' }}
+                        </label>
+                        <div style="position: relative;">
+                            <input type="password" id="password" name="password" class="form-input" {{ user ? '' : 'required' }} style="padding-right: 40px;">
+                            <button type="button" onclick="const p=document.getElementById('password'); p.type=p.type==='password'?'text':'password'; this.textContent=p.type==='password'?'👁️':'🔒';" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.2rem;">👁️</button>
+                        </div>
+                    </div>
+
+                    {# === GESTION PÉDAGOGIQUE === #}
+                    <h3 style="margin: 16px 0 0; padding-bottom: 8px; border-bottom: 2px solid var(--primary-color);">Gestion Pédagogique</h3>
+
+                    <div>
+                        <label for="centre" style="display: block; font-weight: 600; margin-bottom: 8px;">Centre CESI *</label>
+                        <select name="centre" id="centre" class="form-input form-select" required>
+                            <option value="">-- Choisir un centre --</option>
+                            {% for c in all_centres %}
+                                <option value="{{ c.nom }}" {% if user and user.centre == c.nom %}selected{% endif %}>{{ c.nom }}</option>
+                            {% endfor %}
+                        </select>
+                        <small style="color: var(--text-muted);">Le pilote sera rattaché géographiquement à ce centre.</small>
+                    </div>
+
+                    <div>
+                        <label style="display: block; font-weight: 600; margin-bottom: 8px;">Promotions associées</label>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 12px;">
+                            Cochez les promotions que ce pilote gère.
+                        </p>
+                        
+                        <div style="display: flex; flex-wrap: wrap; gap: 12px; padding: 16px; background: var(--bg-hover); border-radius: 12px; margin-bottom: 12px;">
+                            {% for promo in all_promotions %}
+                                <label class="promo-label" data-centre="{{ promo.centre_nom }}" style="display: flex; align-items: center; gap: 6px; padding: 8px 16px; background: var(--card-bg); border-radius: 8px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s;">
+                                    <input type="checkbox" name="promotions[]" value="{{ promo.id }}" 
+                                        {% if user and user.promotions is defined and promo.nom in user.promotions %}checked{% endif %}
+                                        style="width: 18px; height: 18px; accent-color: var(--primary-color);">
+                                    <span>{{ promo.nom }} <small style="color: var(--text-muted);">({{ promo.centre_nom }})</small></span>
+                                </label>
+                            {% else %}
+                                <p style="color: var(--text-muted); font-style: italic;">Aucune promotion existante.</p>
+                            {% endfor %}
+                        </div>
+                        <small style="display: block; margin-bottom: 12px;">
+                            <a href="/admin/promotions" target="_blank" style="color: var(--primary-color); font-weight: 600;">+ Créer une nouvelle promotion</a>
+                        </small>
+                    </div>
+                    
+                    <script>
+                        // Filtrer les checkboxes de promotions selon le centre choisi
+                        document.getElementById('centre').addEventListener('change', function() {
+                            const centreParam = this.value;
+                            const labels = document.querySelectorAll('.promo-label');
+                            labels.forEach(label => {
+                                if (centreParam === '' || label.getAttribute('data-centre') === centreParam) {
+                                    label.style.display = 'flex';
+                                } else {
+                                    label.style.display = 'none';
+                                }
+                            });
+                        });
+                        document.getElementById('centre').dispatchEvent(new Event('change'));
+                    </script>
+
+                    {# === EXTENSION RECRUTEUR === #}
+                    <h3 style="margin: 16px 0 0; padding-bottom: 8px; border-bottom: 2px solid var(--primary-color);">Extension Recruteur</h3>
+                    
+                    <div style="padding: 16px; background: var(--bg-hover); border-radius: 12px;">
+                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin-bottom: 16px;">
+                            <input type="checkbox" name="is_recruteur" value="1" 
+                                {% if user and user.is_recruteur %}checked{% endif %}
+                                id="toggle-recruteur"
+                                style="width: 20px; height: 20px; accent-color: var(--primary-color);">
+                            <span style="font-weight: 600;">Activer la casquette Recruteur</span>
+                        </label>
+                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">
+                            Si activé, ce pilote pourra gérer les fiches entreprises et les offres en tant que recruteur.
+                        </p>
+
+                        <div id="recruteur-fields" style="{% if not user or not user.is_recruteur %}display: none;{% endif %}">
+                            <label for="entreprise_id" style="display: block; font-weight: 600; margin-bottom: 8px;">Entreprise associée</label>
+                            <select name="entreprise_id" id="entreprise_id" class="form-input form-select">
+                                <option value="">-- Aucune entreprise --</option>
+                                {% for e in entreprises %}
+                                    <option value="{{ e.id }}" {% if user and user.entreprise_id == e.id %}selected{% endif %}>
+                                        {{ e.nom }} ({{ e.localisation ?? 'N/A' }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                            <small style="color: var(--text-muted);">L'entreprise dont ce pilote-recruteur gère la fiche et les offres.</small>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 16px;">
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">{{ user ? 'Enregistrer les modifications' : 'Créer le pilote' }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // Toggle des champs recruteur
+        document.getElementById('toggle-recruteur').addEventListener('change', function() {
+            document.getElementById('recruteur-fields').style.display = this.checked ? 'block' : 'none';
+        });
+    </script>
+{% endblock %}

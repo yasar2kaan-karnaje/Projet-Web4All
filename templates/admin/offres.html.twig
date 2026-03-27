@@ -1,0 +1,125 @@
+{% extends 'base.html.twig' %}
+
+{% set active_page = 'admin-offres' %}
+
+{% block title %}Gestion des Offres - Dépi'Stage{% endblock %}
+
+{% block content %}
+    <section class="section">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">Gestion des Offres de Stage</h1>
+                <p class="page-subtitle">Rechercher, créer, modifier et supprimer des offres</p>
+            </div>
+
+            <div class="alert alert-info">
+                <strong>Permissions :</strong> Admin (toutes actions) | Pilote (toutes actions)
+            </div>
+
+            {# Stats Carrousel : STx 11 #}
+            <div class="stats-carousel-wrapper" style="overflow-x: auto; white-space: nowrap; padding-bottom: 16px; margin-bottom: 24px;">
+                <div class="stats-carousel" style="display: inline-flex; gap: 16px;">
+                    
+                    <div class="stat-card" style="min-width: 250px; flex-shrink: 0; white-space: normal;">
+                        <div class="stat-number" style="color: var(--primary-color);">{{ stats.total }}</div>
+                        <div class="stat-label">Offres en base</div>
+                    </div>
+                    
+                    <div class="stat-card" style="min-width: 250px; flex-shrink: 0; white-space: normal;">
+                        <div class="stat-number" style="color: var(--primary-color);">{{ stats.avg_candidatures }}</div>
+                        <div class="stat-label">Candidatures moyenne/offre</div>
+                    </div>
+
+                    <div class="stat-card" style="min-width: 280px; flex-shrink: 0; white-space: normal;">
+                        <div class="stat-label" style="font-weight: 600; margin-bottom: 8px;">Top Wish-list</div>
+                        <ul style="padding-left: 20px; font-size: 0.9rem; color: var(--text-color);">
+                            {% for top in stats.top_wishlist %}
+                                <li>{{ top.titre|slice(0,25) }}... ({{ top.nb }} ajouts)</li>
+                            {% else %}
+                                <li>Aucune offre en wish-list</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <div class="stat-card" style="min-width: 280px; flex-shrink: 0; white-space: normal;">
+                        <div class="stat-label" style="font-weight: 600; margin-bottom: 8px;">Répartition durée stage</div>
+                        <ul style="padding-left: 20px; font-size: 0.9rem; color: var(--text-color);">
+                            {% for rep in stats.repartition_duree %}
+                                <li>{{ rep.duree }} : {{ rep.nb }} offre(s)</li>
+                            {% else %}
+                                <li>Données insuffisantes</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+
+            {# Recherche #}
+            <div class="search-bar" style="display: flex; justify-content: space-between; align-items: center;">
+                <form action="/admin/offres" method="get" style="display: flex; gap: 12px; flex-grow: 1; max-width: 600px;">
+                    <input type="text" name="q" class="form-input" placeholder="Rechercher une offre..." value="{{ search }}">
+                    <button type="submit" class="btn btn-primary">Rechercher</button>
+                </form>
+                <a href="/admin/offre/creer" class="btn btn-primary" style="background-color: #28a745; border-color: #28a745;">+ Créer une offre</a>
+            </div>
+
+            {# Liste #}
+            {% if offres is not empty %}
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Titre</th>
+                                <th>Entreprise</th>
+                                <th>Lieu</th>
+                                <th>Rémunération</th>
+                                <th>Candidats</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for offre in offres %}
+                                <tr>
+                                    <td><a href="/offre/{{ offre.id }}">{{ offre.titre }}</a></td>
+                                    <td>{{ offre.entreprise_nom }}</td>
+                                    <td>{{ offre.lieu }}</td>
+                                    <td>{{ offre.remuneration }}</td>
+                                    <td>{{ offre.nb_candidatures }}</td>
+                                    <td style="display: flex; gap: 8px;">
+                                        <a href="/admin/offre/{{ offre.id }}/modifier" class="btn btn-outline btn-sm">Modifier</a>
+                                        <form action="/admin/offre/{{ offre.id }}/supprimer" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette offre ?');">
+                                            <button type="submit" class="btn btn-outline btn-sm" style="color: #dc3545; border-color: #dc3545;">Supprimer</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if pagination.pages > 1 %}
+                    <div class="pagination">
+                        {% if pagination.current_page > 1 %}
+                            <a href="/admin/offres?q={{ search }}&page={{ pagination.current_page - 1 }}" class="pagination-btn">&lsaquo;</a>
+                        {% else %}
+                            <span class="pagination-btn disabled">&lsaquo;</span>
+                        {% endif %}
+                        {% for i in 1..pagination.pages %}
+                            <a href="/admin/offres?q={{ search }}&page={{ i }}" class="pagination-btn{% if i == pagination.current_page %} active{% endif %}">{{ i }}</a>
+                        {% endfor %}
+                        {% if pagination.current_page < pagination.pages %}
+                            <a href="/admin/offres?q={{ search }}&page={{ pagination.current_page + 1 }}" class="pagination-btn">&rsaquo;</a>
+                        {% else %}
+                            <span class="pagination-btn disabled">&rsaquo;</span>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
+                    <p>Aucune offre trouvée.</p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

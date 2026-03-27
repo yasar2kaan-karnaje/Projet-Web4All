@@ -1,0 +1,84 @@
+{% extends 'base.html.twig' %}
+
+{% set active_page = 'admin-entreprises' %}
+
+{% block title %}Gestion des Entreprises - Dépi'Stage{% endblock %}
+
+{% block content %}
+    <section class="section">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">Gestion des Entreprises</h1>
+                <p class="page-subtitle">Rechercher, créer, modifier et supprimer des entreprises</p>
+            </div>
+
+            <div class="alert alert-info">
+                <strong>Permissions :</strong> Admin (toutes actions) | Pilote (créer, modifier)
+            </div>
+
+            <div class="search-bar" style="display: flex; justify-content: space-between; align-items: center;">
+                <form action="/admin/entreprises" method="get" style="display: flex; gap: 12px; flex-grow: 1; max-width: 600px;">
+                    <input type="text" name="q" class="form-input" placeholder="Rechercher une entreprise..." value="{{ search }}">
+                    <button type="submit" class="btn btn-primary">Rechercher</button>
+                </form>
+                <a href="/admin/entreprise/creer" class="btn btn-primary" style="background-color: #28a745; border-color: #28a745;">+ Créer une entreprise</a>
+            </div>
+
+            {% if entreprises is not empty %}
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Entreprise</th>
+                                <th>Secteur</th>
+                                <th>Localisation</th>
+                                <th>Offres</th>
+                                <th>Note</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for e in entreprises %}
+                                <tr>
+                                    <td><a href="/entreprise/{{ e.id }}">{{ e.nom }}</a></td>
+                                    <td>{{ e.secteur }}</td>
+                                    <td>{{ e.localisation }}</td>
+                                    <td>{{ e.nb_offres }}</td>
+                                    <td>{{ e.note_moyenne ?? '-' }}/5</td>
+                                    <td style="display: flex; gap: 8px;">
+                                        <a href="/admin/entreprise/{{ e.id }}/modifier" class="btn btn-outline btn-sm">Modifier</a>
+                                        <form action="/admin/entreprise/{{ e.id }}/supprimer" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette entreprise ?');">
+                                            <button type="submit" class="btn btn-outline btn-sm" style="color: #dc3545; border-color: #dc3545;">Supprimer</button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {% if pagination.pages > 1 %}
+                    <div class="pagination">
+                        {% if pagination.current_page > 1 %}
+                            <a href="/admin/entreprises?q={{ search }}&page={{ pagination.current_page - 1 }}" class="pagination-btn">&lsaquo;</a>
+                        {% else %}
+                            <span class="pagination-btn disabled">&lsaquo;</span>
+                        {% endif %}
+                        {% for i in 1..pagination.pages %}
+                            <a href="/admin/entreprises?q={{ search }}&page={{ i }}" class="pagination-btn{% if i == pagination.current_page %} active{% endif %}">{{ i }}</a>
+                        {% endfor %}
+                        {% if pagination.current_page < pagination.pages %}
+                            <a href="/admin/entreprises?q={{ search }}&page={{ pagination.current_page + 1 }}" class="pagination-btn">&rsaquo;</a>
+                        {% else %}
+                            <span class="pagination-btn disabled">&rsaquo;</span>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
+                    <p>Aucune entreprise trouvée.</p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

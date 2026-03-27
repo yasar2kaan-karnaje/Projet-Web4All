@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% set active_page = 'admin-entreprises' %}
+
+{% block title %}{{ entreprise ? 'Modifier' : 'Créer' }} une Entreprise - Dépi'Stage{% endblock %}
+
+{% block content %}
+    <section class="section">
+        <div class="container" style="max-width: 600px;">
+            <a href="/admin/entreprises" class="back-link">&larr; Retour aux entreprises</a>
+            
+            <div class="page-header" style="margin-top: 24px;">
+                <h1 class="page-title">{{ entreprise ? 'Modifier l\'entreprise' : 'Nouvelle entreprise' }}</h1>
+            </div>
+
+            <div class="detail-section">
+                <form action="/admin/entreprise/{{ entreprise ? entreprise.id ~ '/modifier' : 'creer' }}" method="post" style="display: flex; flex-direction: column; gap: 16px;">
+                    
+                    <div>
+                        <label for="nom" style="display: block; font-weight: 600; margin-bottom: 8px;">Nom de l'entreprise *</label>
+                        <input type="text" id="nom" name="nom" class="form-input" value="{{ entreprise.nom ?? '' }}" required>
+                    </div>
+
+                    <div>
+                        <label for="secteur" style="display: block; font-weight: 600; margin-bottom: 8px;">Secteur d'activité *</label>
+                        <input type="text" id="secteur" name="secteur" class="form-input" value="{{ entreprise.secteur ?? '' }}" required>
+                    </div>
+
+                    <div>
+                        <label for="localisation" style="display: block; font-weight: 600; margin-bottom: 8px;">Localisation (Ville, Pays) *</label>
+                        <input type="text" id="localisation" name="localisation" class="form-input" value="{{ entreprise.localisation ?? '' }}" required>
+                    </div>
+
+                    <div style="display: flex; gap: 16px;">
+                        <div style="flex: 1;">
+                            <label for="email_contact" style="display: block; font-weight: 600; margin-bottom: 8px;">Email de contact</label>
+                            <input type="email" id="email_contact" name="email_contact" class="form-input" value="{{ entreprise.email_contact ?? '' }}">
+                        </div>
+                        <div style="flex: 1;">
+                            <label for="tel_contact" style="display: block; font-weight: 600; margin-bottom: 8px;">Téléphone de contact</label>
+                            <input type="text" id="tel_contact" name="tel_contact" class="form-input" value="{{ entreprise.tel_contact ?? '' }}">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label for="description" style="display: block; font-weight: 600; margin-bottom: 8px;">Description</label>
+                        <textarea id="description" name="description" class="form-input" rows="5">{{ entreprise.description ?? '' }}</textarea>
+                    </div>
+
+                    <div style="margin-top: 16px;">
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">{{ entreprise ? 'Enregistrer les modifications' : 'Créer l\'entreprise' }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+{% endblock %}

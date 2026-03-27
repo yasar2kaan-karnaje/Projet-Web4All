@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% set active_page = 'admin-dashboard' %}
+
+{% block title %}Administration - Dépi'Stage{% endblock %}
+{% block description %}Panneau d'administration Dépi'Stage.{% endblock %}
+
+{% block content %}
+    <section class="section">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">Tableau de bord Administration</h1>
+                <p class="page-subtitle">Gérez votre plateforme Dépi'Stage</p>
+            </div>
+
+            <div class="alert alert-info" style="margin-bottom: 24px;">
+                {% if role == 'admin' %}
+                    <strong>Rôle actuel :</strong> Administrateur - Accès complet à toutes les fonctionnalités
+                {% else %}
+                    <strong>Rôle actuel :</strong> Pilote - Accès aux étudiants, entreprises et offres
+                {% endif %}
+            </div>
+
+            {# Stats Cards #}
+            <div class="admin-stats">
+                <a href="/admin/etudiants" class="stat-card">
+                    <div class="stat-number">{{ stats.etudiants }}</div>
+                    <div class="stat-label">Étudiants</div>
+                    <span class="stat-action">Gérer →</span>
+                </a>
+                {% if role == 'admin' %}
+                <a href="/admin/pilotes" class="stat-card">
+                    <div class="stat-number">{{ stats.pilotes }}</div>
+                    <div class="stat-label">Pilotes</div>
+                    <span class="stat-action">Gérer →</span>
+                </a>
+                {% endif %}
+                <a href="/admin/entreprises" class="stat-card">
+                    <div class="stat-number">{{ stats.entreprises }}</div>
+                    <div class="stat-label">Entreprises</div>
+                    <span class="stat-action">Gérer →</span>
+                </a>
+                <a href="/admin/offres" class="stat-card">
+                    <div class="stat-number">{{ stats.offres }}</div>
+                    <div class="stat-label">Offres</div>
+                    <span class="stat-action">Gérer →</span>
+                </a>
+            </div>
+
+            {# Actions rapides #}
+            <div class="detail-section">
+                <h3>Actions rapides</h3>
+                <div class="quick-actions">
+                    <a href="/admin/etudiants" class="btn btn-outline">Gérer les étudiants</a>
+                    {% if role == 'admin' %}
+                    <a href="/admin/pilotes" class="btn btn-outline">Gérer les pilotes</a>
+                    {% endif %}
+                    <a href="/admin/entreprises" class="btn btn-outline">Gérer les entreprises</a>
+                    <a href="/admin/offres" class="btn btn-outline">Gérer les offres</a>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
