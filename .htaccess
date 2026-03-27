@@ -1,0 +1,12 @@
+RewriteEngine On
+
+# Forcer le HTTPS (STx 11 - Protocole HTTPS)
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+# Si le fichier ou dossier existe réellement, le servir directement
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Tout le reste passe par index.php
+RewriteRule ^(.*)$ index.php?url=$1 [QSA,L]
