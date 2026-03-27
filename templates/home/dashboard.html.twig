@@ -1,0 +1,68 @@
+{% extends 'base.html.twig' %}
+
+{% set active_page = 'home' %}
+
+{% block title %}Accueil - Dépi'Stage{% endblock %}
+{% block description %}Dépi'Stage - Plateforme de recherche de stages pour étudiants. Sans stage, t'es au chômage !{% endblock %}
+
+{% block content %}
+    {# Hero Section #}
+    <div class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Trouvez le <span class="highlight">stage parfait</span> pour votre carrière</h1>
+            <p class="hero-subtitle">Découvrez des centaines d'opportunités de stage dans les meilleures entreprises. Sans stage, t'es au chômage !</p>
+
+            <div class="search-box">
+                <form action="/offres" method="get" class="search-box-inline">
+                    <div class="form-group" style="flex: 2;">
+                        <input type="text" name="q" class="form-input" placeholder="Rechercher un stage, une entreprise ou une ville...">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg">RECHERCHER</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    {# Dernières offres (depuis la BDD) #}
+    <div class="container section">
+        <div class="section-header" style="text-align: left; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <h2 style="font-size: 1.5rem; font-weight: 700; color: var(--text-primary);">Dernières offres</h2>
+                <p style="color: var(--text-muted);">Les opportunités les plus récentes</p>
+            </div>
+            <a href="/offres" class="btn btn-outline">Voir tout</a>
+        </div>
+
+        {% if latest_offres is not empty %}
+            <div class="grid grid-3">
+                {% for offre in latest_offres %}
+                    <article class="offer-card">
+                        <div class="offer-card-header">
+                            <div>
+                                <div class="offer-title">{{ offre.titre }}</div>
+                                <div class="offer-company">{{ offre.entreprise_nom }}</div>
+                            </div>
+                        </div>
+                        <div class="offer-tags">
+                            {% if offre.lieu %}<span class="tag">{{ offre.lieu }}</span>{% endif %}
+                            {% if offre.duree %}<span class="tag">{{ offre.duree }}</span>{% endif %}
+                        </div>
+                        {% if offre.description %}
+                            <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">
+                                {{ offre.description|length > 120 ? offre.description|slice(0, 120) ~ '...' : offre.description }}
+                            </p>
+                        {% endif %}
+                        <div class="offer-card-footer">
+                            <a href="/offre/{{ offre.id }}" class="btn btn-dark btn-sm">Voir l'offre</a>
+                        </div>
+                    </article>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
+                <p style="font-size: 1.1rem;">Aucune offre disponible pour le moment.</p>
+                <p>Les offres apparaîtront ici une fois ajoutées dans la base de données.</p>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

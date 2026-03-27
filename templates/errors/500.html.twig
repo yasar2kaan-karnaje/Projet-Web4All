@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Erreur technique - Dépi'Stage{% endblock %}
+{% block description %}Une erreur technique est survenue. Veuillez réessayer ultérieurement.{% endblock %}
+
+{% block content %}
+    <section class="section">
+        <div class="container error-page">
+            <div class="error-illustration">
+                <div class="error-code">500</div>
+                <div class="error-visual">
+                    <div class="error-circle error-circle-orange"></div>
+                    <div class="error-gear">&#9881;</div>
+                </div>
+            </div>
+            <h1 class="error-title">Erreur technique</h1>
+            <p class="error-message">
+                Oups ! Quelque chose s'est mal passé de notre côté.<br>
+                Nos équipes sont informées et travaillent à résoudre le problème.
+            </p>
+            <div class="error-actions">
+                <a href="/" class="btn btn-primary btn-lg">Retour à l'accueil</a>
+                <a href="/offres" class="btn btn-outline btn-lg">Voir les offres</a>
+            </div>
+            <p class="error-hint">Si le problème persiste, contactez-nous à <strong>support@depistage.fr</strong></p>
+        </div>
+    </section>
+{% endblock %}

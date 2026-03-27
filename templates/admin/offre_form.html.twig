@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+
+{% set active_page = 'admin-offres' %}
+
+{% block title %}{{ offre ? 'Modifier' : 'Créer' }} une Offre - Dépi'Stage{% endblock %}
+
+{% block content %}
+    <section class="section">
+        <div class="container" style="max-width: 600px;">
+            <a href="/admin/offres" class="back-link">&larr; Retour aux offres</a>
+            
+            <div class="page-header" style="margin-top: 24px;">
+                <h1 class="page-title">{{ offre ? 'Modifier l\'offre' : 'Nouvelle offre' }}</h1>
+            </div>
+
+            <div class="detail-section">
+                <form action="/admin/offre/{{ offre ? offre.id ~ '/modifier' : 'creer' }}" method="post" style="display: flex; flex-direction: column; gap: 16px;">
+                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                    
+                    <div>
+                        <label for="titre" style="display: block; font-weight: 600; margin-bottom: 8px;">Titre de l'offre *</label>
+                        <input type="text" id="titre" name="titre" class="form-input" value="{{ offre.titre ?? '' }}" required>
+                    </div>
+
+                    <div>
+                        <label for="entreprise_id" style="display: block; font-weight: 600; margin-bottom: 8px;">Entreprise *</label>
+                        <select id="entreprise_id" name="entreprise_id" class="form-input" required>
+                            <option value="">-- Sélectionner une entreprise --</option>
+                            {% for e in entreprises %}
+                                <option value="{{ e.id }}" {% if offre and offre.entreprise_id == e.id %}selected{% endif %}>{{ e.nom }} ({{ e.localisation }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="competences" style="display: block; font-weight: 600; margin-bottom: 8px;">Compétences requises *</label>
+                        <input type="text" id="competences" name="competences" class="form-input" value="{{ offre.competences ?? '' }}" placeholder="Ex: PHP, MVC, MySQL" required>
+                    </div>
+
+                    <div>
+                        <label for="duree" style="display: block; font-weight: 600; margin-bottom: 8px;">Durée *</label>
+                        <input type="text" id="duree" name="duree" class="form-input" value="{{ offre.duree ?? '' }}" placeholder="Ex: 6 mois" required>
+                    </div>
+
+                    <div>
+                        <label for="remuneration" style="display: block; font-weight: 600; margin-bottom: 8px;">Rémunération *</label>
+                        <input type="text" id="remuneration" name="remuneration" class="form-input" value="{{ offre.remuneration ?? '' }}" placeholder="Ex: Gratification légale" required>
+                    </div>
+
+                    <div>
+                        <label for="date_debut" style="display: block; font-weight: 600; margin-bottom: 8px;">Date de début *</label>
+                        <input type="date" id="date_debut" name="date_debut" class="form-input" value="{{ offre.date_debut ?? '' }}" required>
+                    </div>
+
+                    <div>
+                        <label for="places" style="display: block; font-weight: 600; margin-bottom: 8px;">Nombre de places *</label>
+                        <input type="number" id="places" name="places" class="form-input" value="{{ offre.places ?? 1 }}" min="1" required>
+                    </div>
+
+                    <div>
+                        <label for="description" style="display: block; font-weight: 600; margin-bottom: 8px;">Description *</label>
+                        <textarea id="description" name="description" class="form-input" rows="5" required>{{ offre.description ?? '' }}</textarea>
+                    </div>
+
+                    <div style="margin-top: 16px;">
+                        <button type="submit" class="btn btn-primary" style="width: 100%;">{{ offre ? 'Enregistrer les modifications' : 'Créer l\'offre' }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </section>
+{% endblock %}
