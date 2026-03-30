@@ -72,29 +72,12 @@
                         <form action="/offre/{{ offre.id }}/postuler" method="post" enctype="multipart/form-data">
                             <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
                             <div class="form-group">
-                                <label class="form-label" for="nom">Nom *</label>
-                                <input type="text" name="nom" id="nom" class="form-input" required>
-                                <span class="error-message" id="error-nom" style="color: red; font-size: 0.85em; display: none;">Ce champ est requis.</span>
+                                <label class="form-label">Votre CV (PDF) *</label>
+                                <input type="file" name="cv" class="form-input" accept=".pdf,.doc,.docx" required>
                             </div>
                             <div class="form-group">
-                                <label class="form-label" for="prenom">Prénom *</label>
-                                <input type="text" name="prenom" id="prenom" class="form-input" required>
-                                <span class="error-message" id="error-prenom" style="color: red; font-size: 0.85em; display: none;">Ce champ est requis.</span>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="courriel">Courriel *</label>
-                                <input type="email" name="courriel" id="courriel" class="form-input" required>
-                                <span class="error-message" id="error-courriel" style="color: red; font-size: 0.85em; display: none;">Veuillez entrer une adresse email valide.</span>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="cv">Votre CV *</label>
-                                <input type="file" name="cv" id="cv" class="form-input" accept=".pdf,.doc,.docx,.odt,.rtf,.jpg,.png" required>
-                                <span class="error-message" id="error-cv" style="color: red; font-size: 0.85em; display: none;">Fichier invalide ou trop volumineux.</span>
-                            </div>
-                            <div class="form-group">
-                                <label class="form-label" for="message_recruteur">Message au recruteur *</label>
-                                <textarea name="message_recruteur" id="message_recruteur" class="form-input form-textarea" placeholder="Expliquez pourquoi vous êtes le candidat idéal..." required></textarea>
-                                <span class="error-message" id="error-message_recruteur" style="color: red; font-size: 0.85em; display: none;">Ce champ est requis.</span>
+                                <label class="form-label">Lettre de motivation *</label>
+                                <textarea name="lettre_motivation" class="form-input form-textarea" placeholder="Expliquez pourquoi vous êtes le candidat idéal..." required></textarea>
                             </div>
                             <div style="display: flex; gap: 12px; margin-top: 16px;">
                                 <button type="submit" class="btn btn-primary btn-lg">Envoyer ma candidature</button>

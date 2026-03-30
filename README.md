@@ -1,104 +1,369 @@
-# Dépi'Stage - Plateforme de Recherche de Stages
+# Depi'Stage -- Guide d'installation et de mise en route
 
-Dépi'Stage est une application web conçue pour les étudiants (particulièrement du CESI) afin de faciliter leur recherche de stage, et pour l'équipe pédagogique afin d'administrer les offres, entreprises, étudiants et candidatures. 
-
-L'application est construite en PHP 8.1+ avec une architecture MVC "maison" (sans grand framework type Symfony, mais utilisant Composer pour l'autoloading) et Twig pour les templates.
+Ce document explique comment recuperer le projet, le configurer et le faire tourner sur votre machine. Il est destine a toute personne souhaitant tester l'application en local.
 
 ---
 
-## 🛠️ Prérequis Système
+## 1. Pre-requis
 
-Pour faire tourner le projet en local sur votre machine, vous devez avoir installé :
+Vous devez avoir les elements suivants installes sur votre machine (Linux, Ubuntu de preference) :
 
-1. **PHP >= 8.1** (avec l'extension pdo_mysql activée).
-2. **Composer** (Gestionnaire de dépendances PHP).
-3. **MySQL** ou **MariaDB** (Base de données).
+- **PHP 8.1 ou superieur** avec les extensions `pdo`, `pdo_mysql` et `mbstring`
+- **Composer** (gestionnaire de dependances PHP)
+- **Apache 2** avec le module `mod_rewrite`
+- **MySQL** ou **MariaDB**
+- **Git**
 
----
-
-## 🚀 Installation & Lancement Rapide
-
-### 1. Cloner ou Extraire les fichiers
-Si vous avez reçu ce projet sous forme de dossier zip ou de répertoire, placez-le dans le dossier de votre choix (par ex. sous Windows dans un dossier de dev ou sous WSL : `/var/www/ajob4u.fr`).
-
-Ouvrez un terminal (ou invite de commandes/PowerShell) à la racine du projet.
-
-### 2. Installer les dépendances (Vendor)
-Le projet utilise Twig pour l'affichage géré par Composer. Exécutez la commande suivante à la racine du projet :
+Si certains composants manquent, voici comment les installer en une seule commande sur Ubuntu/Debian :
 
 ```bash
-composer install
+sudo apt update
+sudo apt install apache2 php php-pdo php-mysql php-mbstring mysql-server git composer -y
 ```
-*(Cela va créer le dossier `vendor/` avec toutes les bibliothèques requises).*
 
-### 3. Configurer la base de données (MySQL)
+---
 
-**A. Importation du Schéma**
-Vous devez créer la base de données et les tables nécessaires. 
-Grâce à un client SQL (comme phpMyAdmin, DBeaver, ou en ligne de commande), importez le fichier de structure principal :
-1. Fichier principal : `sql/schema.sql`. (Ce script va créer de lui-même la base de données `depistage` ainsi que les données et utilisateurs par défaut).
-2. Si votre application a besoin de données récentes, exécutez également les scripts de migration présents dans le dossier `sql/` (par exemple : `alter_entreprises.sql`, et les fichiers `migration_xxx.sql`).
+## 2. Cloner le projet
 
-**B. Configuration des accès**
-Ouvrez le fichier local dédié à la connexion SQL situé ici : `config/database.php`.
-Vérifiez que les informations de connexion (hôte, nom d'utilisateur, et mot de passe DB) correspondent bien à votre environnement MySQL local :
+Recuperez le depot sur votre machine :
+
+```bash
+cd /var/www
+sudo git clone https://github.com/<utilisateur>/Projet-Web4All.git depistage
+```
+
+Donnez les droits necessaires a Apache pour lire les fichiers :
+
+```bash
+sudo chown -R www-data:www-data /var/www/depistage
+sudo chmod -R 755 /var/www/depistage
+```
+
+> Remplacez `<utilisateur>` par le nom du compte GitHub qui heberge le depot.
+
+---
+
+## 3. Installer les dependances PHP
+
+Placez-vous dans le dossier du projet et lancez Composer :
+
+```bash
+cd /var/www/depistage
+sudo composer install
+```
+
+Cela va creer le dossier `vendor/` avec Twig (moteur de templates) et PHPUnit (tests).
+
+---
+
+## 4. Creer et configurer la base de donnees
+
+### 4.1 Creer la base de donnees
+
+Connectez-vous a MySQL :
+
+```bash
+sudo mysql -u root
+```
+
+Puis executez les commandes suivantes :
+
+```sql
+CREATE DATABASE depistage CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'depistage_user'@'localhost' IDENTIFIED BY 'votre_mot_de_passe';
+GRANT ALL PRIVILEGES ON depistage.* TO 'depistage_user'@'localhost';
+FLUSH PRIVILEGES;
+EXIT;
+```
+
+### 4.2 Importer le schema SQL
+
+Un fichier `.sql` est fourni avec le projet (dump de la base), importez-le :
+
+```bash
+sudo mysql -u depistage_user -p depistage < chemin/vers/le/fichier.sql
+```
+
+### 4.3 Renseigner les identifiants de connexion
+
+Editez le fichier `config/database.php` pour y mettre vos informations :
+
+```bash
+nano config/database.php
+```
+
+Le contenu doit ressembler a ceci :
 
 ```php
-// config/database.php
+<?php
+
 return [
-    'host' => '127.0.0.1', // ou 'localhost'
-    'dbname' => 'depistage',
-    'username' => 'root', // Votre utilisateur MySQL
-    'password' => 'VOTRE_MOT_DE_PASSE_SQL', // Renseignez ici votre mdp MySQL (ex: JUL678jul678@)
-    'charset' => 'utf8mb4',
+    'host'     => '127.0.0.1',
+    'dbname'   => 'depistage',
+    'username' => 'depistage_user',
+    'password' => 'votre_mot_de_passe',
+    'charset'  => 'utf8mb4',
 ];
 ```
 
-### 4. Démarrer le serveur local PHP
-Pour tester rapidement sans configurer un serveur Apache/Nginx (comme XAMPP ou WAMP), vous pouvez utiliser le serveur interne de PHP.
+---
 
-1. Déplacez-vous dans le dossier `public` :
-   ```bash
-   cd public
-   ```
-2. Lancez le serveur local :
-   ```bash
-   php -S localhost:8000
-   ```
+## 5. Configurer Apache
 
-*L'application est maintenant disponible !*
+### 5.1 Activer les modules necessaires
+
+```bash
+sudo a2enmod rewrite
+sudo a2enmod expires
+```
+
+### 5.2 Creer le VirtualHost principal
+
+Creez un fichier de configuration pour le site :
+
+```bash
+sudo nano /etc/apache2/sites-available/depistage.conf
+```
+
+Collez le contenu suivant :
+
+```apache
+<VirtualHost *:80>
+    ServerName depistage.local
+
+    DocumentRoot /var/www/depistage/public
+
+    <Directory /var/www/depistage/public>
+        Options -Indexes +FollowSymLinks
+        AllowOverride All
+        Require all granted
+    </Directory>
+
+    ErrorLog ${APACHE_LOG_DIR}/depistage_error.log
+    CustomLog ${APACHE_LOG_DIR}/depistage_access.log combined
+</VirtualHost>
+```
+
+> Le `AllowOverride All` est indispensable pour que le fichier `.htaccess` du projet fonctionne (URL rewriting).
+
+### 5.3 (Optionnel) VirtualHost pour les fichiers statiques
+
+Si vous souhaitez servir les fichiers statiques (CSS, images) depuis un sous-domaine dedie, un fichier de configuration est fourni dans le projet sous le nom `vhost_statique.conf`. Son contenu :
+
+```apache
+<VirtualHost *:80>
+    ServerName static.depistage.local
+    DocumentRoot /var/www/depistage/public
+
+    <Directory /var/www/depistage/public>
+        Options -Indexes +FollowSymLinks
+        AllowOverride None
+        Require all granted
+
+        # Bloquer l'execution de PHP sur ce vhost
+        <FilesMatch "\.php$">
+            Require all denied
+        </FilesMatch>
+
+        # Cache navigateur pour les performances
+        <IfModule mod_expires.c>
+            ExpiresActive On
+            ExpiresByType image/png "access plus 1 month"
+            ExpiresByType image/jpeg "access plus 1 month"
+            ExpiresByType text/css "access plus 1 week"
+            ExpiresByType application/javascript "access plus 1 week"
+        </IfModule>
+    </Directory>
+</VirtualHost>
+```
+
+Pour l'activer :
+
+```bash
+sudo cp /var/www/depistage/vhost_statique.conf /etc/apache2/sites-available/depistage-static.conf
+sudo a2ensite depistage-static
+```
+
+> Ce vhost statique n'est pas obligatoire pour faire fonctionner le projet. Il sert uniquement a ameliorer les performances et la securite en production.
+
+### 5.4 Activer le site et desactiver le site par defaut
+
+```bash
+sudo a2ensite depistage.conf
+sudo a2dissite 000-default.conf
+```
+
+### 5.5 Redemarrer Apache pour appliquer les changements
+
+```bash
+sudo systemctl restart apache2
+```
 
 ---
 
-## 🌐 Utilisation
+## 6. Configurer le fichier hosts (acces en local)
 
-Ouvrez votre navigateur et rendez-vous sur : [http://localhost:8000](http://localhost:8000)
+Pour acceder au site via `depistage.local` dans votre navigateur, ajoutez une entree dans votre fichier hosts :
 
-### 👥 Comptes de démonstration pré-configurés
+```bash
+sudo nano /etc/hosts
+```
 
-La base de données (`sql/schema.sql`) inclut des jeux de test pour essayer tous les rôles immédiatement :
+Ajoutez la ligne suivante :
 
-*   **Administrateur** (Accès complet à la gestion CRUD du site)
-    *   **Email:** `admin@depistage.eu`
-    *   **Mot de passe:** `admin123`
+```
+127.0.0.1    depistage.local
+```
 
-*   **Pilote / Tuteur** (Gestion des promotions, consultations des élèves)
-    *   **Email:** `m.dupont@cesi.fr`
-    *   **Mot de passe:** `pilote123`
+Si vous avez aussi configure le vhost statique, ajoutez aussi :
 
-*   **Étudiant** (Recherche d'offres, postuler à des stages, Wishlist)
-    *   **Email:** `a.dupont@viacesi.fr`
-    *   **Mot de passe:** `etudiant123`
+```
+127.0.0.1    static.depistage.local
+```
 
 ---
 
-## 📂 Architecture simplifiée
+## 7. Tester le site
 
-*   **`config/`** : Fichiers de configuration (connexion BDD).
-*   **`public/`** : Fichiers accessibles publiquement. Point d'entrée du site (`index.php`) et ressources CSS, Images...
-*   **`src/`** : Logique métier en PHP orienté objet.
-    *   **`Controller/`** : Les contrôleurs interceptent l'URL, préparent les données et demandent l'affichage.
-    *   **`Model/`** : Les modèles centralisent toutes les requêtes directes à la base de données.
-    *   `Router.php`, `Database.php` : Composants du cœur du Framework MVC "Maison".
-*   **`templates/`** : Les fichiers d'affichage structurés (Vues) écrit en Twig (`.html.twig`).
-*   **`sql/`** : Scripts de création et migration de la base de données.
+Ouvrez votre navigateur et rendez-vous sur :
+
+```
+http://depistage.local
+```
+
+Vous devriez voir la page d'accueil de Depi'Stage. Si vous obtenez une erreur 500, verifiez les points suivants :
+
+- Les identifiants en base de donnees dans `config/database.php` sont corrects.
+- Le dossier `vendor/` existe bien (sinon relancez `composer install`).
+- Le module `mod_rewrite` est bien active (`sudo a2enmod rewrite` puis redemarrez Apache).
+- Les droits sur le dossier sont corrects (`sudo chown -R www-data:www-data /var/www/depistage`).
+- Consultez les logs Apache pour plus de details : `sudo tail -f /var/log/apache2/depistage_error.log`.
+
+---
+
+## 8. Comptes et roles
+
+L'application gere trois roles d'utilisateurs :
+
+| Role      | Ce qu'il peut faire                                                                                  |
+|-----------|------------------------------------------------------------------------------------------------------|
+| Etudiant  | Consulter les offres, postuler, gerer sa wishlist, suivre ses candidatures, evaluer une entreprise.  |
+| Pilote    | Gerer les etudiants de sa promotion, les entreprises, les offres, consulter les candidatures.        |
+| Admin     | Acces complet : gestion des pilotes, etudiants, entreprises, offres, promotions et centres.          |
+
+Les comptes doivent etre crees en base de donnees. Il n'y a pas de page d'inscription publique -- c'est volontaire, les comptes sont crees par un administrateur ou un pilote depuis le panneau d'administration accessible a `/admin`.
+
+---
+
+## 9. Lancer les tests
+
+Les tests unitaires utilisent PHPUnit :
+
+```bash
+cd /var/www/depistage
+./vendor/bin/phpunit tests/
+```
+
+---
+
+## 10. Structure du projet (pour reference)
+
+```
+Projet-Web4All/
+|-- config/
+|   |-- database.php              # Identifiants de la base de donnees
+|
+|-- public/                       # DocumentRoot Apache (seul dossier accessible)
+|   |-- index.php                 # Point d'entree unique (front controller)
+|   |-- .htaccess                 # URL rewriting + redirection HTTPS
+|   |-- robots.txt
+|   |-- sitemap.xml
+|   |-- css/                      # Feuilles de style
+|   |-- logo/                     # Logo et images
+|
+|-- src/
+|   |-- Controller/               # Logique metier (10 controleurs)
+|   |-- Model/                    # Acces aux donnees via PDO (7 modeles)
+|
+|-- templates/                    # Vues Twig
+|   |-- base.html.twig            # Layout principal
+|   |-- admin/                    # Vues d'administration
+|   |-- auth/                     # Connexion
+|   |-- offre/                    # Catalogue et detail des offres
+|   |-- entreprise/               # Liste et detail des entreprises
+|   |-- etudiant/                 # Candidatures et wishlist
+|   |-- pilote/                   # Suivi des candidatures pilote
+|   |-- profil/                   # Profil utilisateur
+|   |-- errors/                   # Pages 403, 404, 500
+|
+|-- tests/                        # Tests PHPUnit
+|-- composer.json                 # Dependances (Twig, PHPUnit)
+|-- vhost_statique.conf           # Exemple de vhost statique
+```
+
+---
+
+## Resume des commandes (copier-coller rapide)
+
+Pour ceux qui veulent aller vite, voici toutes les commandes dans l'ordre :
+
+```bash
+# Installation des paquets
+sudo apt update
+sudo apt install apache2 php php-pdo php-mysql php-mbstring mysql-server git composer -y
+
+# Cloner le projet
+cd /var/www
+sudo git clone https://github.com/<utilisateur>/Projet-Web4All.git depistage
+sudo chown -R www-data:www-data /var/www/depistage
+sudo chmod -R 755 /var/www/depistage
+
+# Dependances PHP
+cd /var/www/depistage
+sudo composer install
+
+# Base de donnees
+sudo mysql -u root -e "
+  CREATE DATABASE depistage CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+  CREATE USER 'depistage_user'@'localhost' IDENTIFIED BY 'votre_mot_de_passe';
+  GRANT ALL PRIVILEGES ON depistage.* TO 'depistage_user'@'localhost';
+  FLUSH PRIVILEGES;
+"
+
+# Configurer la connexion
+nano config/database.php
+
+# Apache
+sudo a2enmod rewrite
+sudo a2enmod expires
+
+# Creer le VirtualHost (copier le contenu donne plus haut)
+sudo nano /etc/apache2/sites-available/depistage.conf
+
+# Activer le site
+sudo a2ensite depistage.conf
+sudo a2dissite 000-default.conf
+sudo systemctl restart apache2
+
+# Fichier hosts
+echo "127.0.0.1    depistage.local" | sudo tee -a /etc/hosts
+
+# Ouvrir dans le navigateur
+# http://depistage.local
+```
+
+---
+
+## En cas de probleme
+
+| Symptome                        | Cause probable                                      | Solution                                                        |
+|---------------------------------|-----------------------------------------------------|-----------------------------------------------------------------|
+| Page blanche ou erreur 500      | Dependances manquantes                              | Verifier que `composer install` a bien tourne                   |
+| Erreur de connexion BDD         | Identifiants incorrects dans `config/database.php`  | Verifier host, dbname, username et password                     |
+| Page "Not Found" sur les routes | mod_rewrite desactive                               | `sudo a2enmod rewrite` puis `sudo systemctl restart apache2`    |
+| Acces interdit (403)            | Droits de fichiers                                  | `sudo chown -R www-data:www-data /var/www/depistage`            |
+| Erreur Twig                     | Dossier vendor absent                               | Relancer `composer install`                                     |
+
+---
+
+Projet realise par le Groupe 2 CPIA2 Orléans 2026 du CESI dans le cadre du module Web.
