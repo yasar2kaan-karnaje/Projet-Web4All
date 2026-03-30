@@ -10,15 +10,16 @@ Vous devez avoir les elements suivants installes sur votre machine (Linux, Ubunt
 
 - **PHP 8.1 ou superieur** avec les extensions `pdo`, `pdo_mysql` et `mbstring`
 - **Composer** (gestionnaire de dependances PHP)
-- **Apache 2** avec le module `mod_rewrite`
+- **Apache 2** avec les modules `mod_rewrite`, `mod_ssl` et `mod_expires`
 - **MySQL** ou **MariaDB**
 - **Git**
+- **Certbot** (pour generer un certificat HTTPS Let's Encrypt)
 
 Si certains composants manquent, voici comment les installer en une seule commande sur Ubuntu/Debian :
 
 ```bash
 sudo apt update
-sudo apt install apache2 php php-pdo php-mysql php-mbstring mysql-server git composer -y
+sudo apt install apache2 php php-pdo php-mysql php-mbstring mysql-server git composer certbot python3-certbot-apache -y
 ```
 
 ---
@@ -115,6 +116,7 @@ return [
 ```bash
 sudo a2enmod rewrite
 sudo a2enmod expires
+sudo a2enmod ssl
 ```
 
 ### 5.2 Creer le VirtualHost principal
@@ -129,7 +131,8 @@ Collez le contenu suivant :
 
 ```apache
 <VirtualHost *:80>
-    ServerName depistage.local
+    ServerName depistage.eu
+    ServerAlias www.depistage.eu
 
     DocumentRoot /var/www/depistage/public
 
@@ -152,7 +155,7 @@ Si vous souhaitez servir les fichiers statiques (CSS, images) depuis un sous-dom
 
 ```apache
 <VirtualHost *:80>
-    ServerName static.depistage.local
+    ServerName static.depistage.eu
     DocumentRoot /var/www/depistage/public
 
     <Directory /var/www/depistage/public>
@@ -181,7 +184,7 @@ Pour l'activer :
 
 ```bash
 sudo cp /var/www/depistage/vhost_statique.conf /etc/apache2/sites-available/depistage-static.conf
-sudo a2ensite depistage-static
+sudo a2ensite depistage-static.conf
 ```
 
 > Ce vhost statique n'est pas obligatoire pour faire fonctionner le projet. Il sert uniquement a ameliorer les performances et la securite en production.
@@ -193,7 +196,13 @@ sudo a2ensite depistage.conf
 sudo a2dissite 000-default.conf
 ```
 
-### 5.5 Redemarrer Apache pour appliquer les changements
+### 5.5 Generer les certificats HTTPS
+
+```bash
+sudo certbot --apache -d depistage.eu -d www.depistage.eu -d static.depistage.eu
+```
+
+### 5.6 Redemarrer Apache pour appliquer les changements
 
 ```bash
 sudo systemctl restart apache2
@@ -203,22 +212,39 @@ sudo systemctl restart apache2
 
 ## 6. Configurer le fichier hosts (acces en local)
 
-Pour acceder au site via `depistage.local` dans votre navigateur, ajoutez une entree dans votre fichier hosts :
+### Linux / macOS
 
 ```bash
 sudo nano /etc/hosts
 ```
 
-Ajoutez la ligne suivante :
+Ajoutez les lignes suivantes :
 
 ```
-127.0.0.1    depistage.local
+127.0.0.1    depistage.eu
+127.0.0.1    www.depistage.eu
+127.0.0.1    static.depistage.eu
 ```
 
-Si vous avez aussi configure le vhost statique, ajoutez aussi :
+### Windows
+
+Modifier le fichier :
 
 ```
-127.0.0.1    static.depistage.local
+C:\Windows\System32\drivers\etc\hosts
+```
+
+Ajouter :
+
+```
+127.0.0.1 depistage.eu
+127.0.0.1 www.depistage.eu
+127.0.0.1 static.depistage.eu
+
+#IPV6
+::1 depistage.eu
+::1 www.depistage.eu
+::1 static.depistage.eu
 ```
 
 ---
@@ -228,7 +254,7 @@ Si vous avez aussi configure le vhost statique, ajoutez aussi :
 Ouvrez votre navigateur et rendez-vous sur :
 
 ```
-http://depistage.local
+https://depistage.eu
 ```
 
 Vous devriez voir la page d'accueil de Depi'Stage. Si vous obtenez une erreur 500, verifiez les points suivants :
@@ -245,11 +271,11 @@ Vous devriez voir la page d'accueil de Depi'Stage. Si vous obtenez une erreur 50
 
 L'application gere trois roles d'utilisateurs :
 
-| Role      | Ce qu'il peut faire                                                                                  |
-|-----------|------------------------------------------------------------------------------------------------------|
-| Etudiant  | Consulter les offres, postuler, gerer sa wishlist, suivre ses candidatures, evaluer une entreprise.  |
-| Pilote    | Gerer les etudiants de sa promotion, les entreprises, les offres, consulter les candidatures.        |
-| Admin     | Acces complet : gestion des pilotes, etudiants, entreprises, offres, promotions et centres.          |
+| Role      | Ce qu'il peut faire |
+|-----------|---------------------|
+| Etudiant  | Consulter les offres, postuler, gerer sa wishlist, suivre ses candidatures, evaluer une entreprise |
+| Pilote    | Gerer les etudiants de sa promotion, les entreprises, les offres, consulter les candidatures |
+| Admin     | Acces complet : gestion des pilotes, etudiants, entreprises, offres, promotions et centres |
 
 Les comptes doivent etre crees en base de donnees. Il n'y a pas de page d'inscription publique -- c'est volontaire, les comptes sont crees par un administrateur ou un pilote depuis le panneau d'administration accessible a `/admin`.
 
@@ -271,46 +297,44 @@ cd /var/www/depistage
 ```
 Projet-Web4All/
 |-- config/
-|   |-- database.php              # Identifiants de la base de donnees
+|   |-- database.php
 |
-|-- public/                       # DocumentRoot Apache (seul dossier accessible)
-|   |-- index.php                 # Point d'entree unique (front controller)
-|   |-- .htaccess                 # URL rewriting + redirection HTTPS
+|-- public/
+|   |-- index.php
+|   |-- .htaccess
 |   |-- robots.txt
 |   |-- sitemap.xml
-|   |-- css/                      # Feuilles de style
-|   |-- logo/                     # Logo et images
+|   |-- css/
+|   |-- logo/
 |
 |-- src/
-|   |-- Controller/               # Logique metier (10 controleurs)
-|   |-- Model/                    # Acces aux donnees via PDO (7 modeles)
+|   |-- Controller/
+|   |-- Model/
 |
-|-- templates/                    # Vues Twig
-|   |-- base.html.twig            # Layout principal
-|   |-- admin/                    # Vues d'administration
-|   |-- auth/                     # Connexion
-|   |-- offre/                    # Catalogue et detail des offres
-|   |-- entreprise/               # Liste et detail des entreprises
-|   |-- etudiant/                 # Candidatures et wishlist
-|   |-- pilote/                   # Suivi des candidatures pilote
-|   |-- profil/                   # Profil utilisateur
-|   |-- errors/                   # Pages 403, 404, 500
+|-- templates/
+|   |-- base.html.twig
+|   |-- admin/
+|   |-- auth/
+|   |-- offre/
+|   |-- entreprise/
+|   |-- etudiant/
+|   |-- pilote/
+|   |-- profil/
+|   |-- errors/
 |
-|-- tests/                        # Tests PHPUnit
-|-- composer.json                 # Dependances (Twig, PHPUnit)
-|-- vhost_statique.conf           # Exemple de vhost statique
+|-- tests/
+|-- composer.json
+|-- vhost_statique.conf
 ```
 
 ---
 
 ## Resume des commandes (copier-coller rapide)
 
-Pour ceux qui veulent aller vite, voici toutes les commandes dans l'ordre :
-
 ```bash
 # Installation des paquets
 sudo apt update
-sudo apt install apache2 php php-pdo php-mysql php-mbstring mysql-server git composer -y
+sudo apt install apache2 php php-pdo php-mysql php-mbstring mysql-server git composer certbot python3-certbot-apache -y
 
 # Cloner le projet
 cd /var/www
@@ -324,20 +348,18 @@ sudo composer install
 
 # Base de donnees
 sudo mysql -u root -e "
-  CREATE DATABASE depistage CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-  CREATE USER 'depistage_user'@'localhost' IDENTIFIED BY 'votre_mot_de_passe';
-  GRANT ALL PRIVILEGES ON depistage.* TO 'depistage_user'@'localhost';
-  FLUSH PRIVILEGES;
+CREATE DATABASE depistage CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER 'depistage_user'@'localhost' IDENTIFIED BY 'votre_mot_de_passe';
+GRANT ALL PRIVILEGES ON depistage.* TO 'depistage_user'@'localhost';
+FLUSH PRIVILEGES;
 "
-
-# Configurer la connexion
-nano config/database.php
 
 # Apache
 sudo a2enmod rewrite
 sudo a2enmod expires
+sudo a2enmod ssl
 
-# Creer le VirtualHost (copier le contenu donne plus haut)
+# Creer le VirtualHost
 sudo nano /etc/apache2/sites-available/depistage.conf
 
 # Activer le site
@@ -345,24 +367,24 @@ sudo a2ensite depistage.conf
 sudo a2dissite 000-default.conf
 sudo systemctl restart apache2
 
-# Fichier hosts
-echo "127.0.0.1    depistage.local" | sudo tee -a /etc/hosts
+# Certificat HTTPS
+sudo certbot --apache -d depistage.eu -d www.depistage.eu -d static.depistage.eu
 
 # Ouvrir dans le navigateur
-# http://depistage.local
+https://depistage.eu
 ```
 
 ---
 
 ## En cas de probleme
 
-| Symptome                        | Cause probable                                      | Solution                                                        |
-|---------------------------------|-----------------------------------------------------|-----------------------------------------------------------------|
-| Page blanche ou erreur 500      | Dependances manquantes                              | Verifier que `composer install` a bien tourne                   |
-| Erreur de connexion BDD         | Identifiants incorrects dans `config/database.php`  | Verifier host, dbname, username et password                     |
-| Page "Not Found" sur les routes | mod_rewrite desactive                               | `sudo a2enmod rewrite` puis `sudo systemctl restart apache2`    |
-| Acces interdit (403)            | Droits de fichiers                                  | `sudo chown -R www-data:www-data /var/www/depistage`            |
-| Erreur Twig                     | Dossier vendor absent                               | Relancer `composer install`                                     |
+| Symptome | Cause probable | Solution |
+|---------|---------------|----------|
+| Page blanche ou erreur 500 | Dependances manquantes | Verifier que `composer install` a bien tourne |
+| Erreur de connexion BDD | Identifiants incorrects dans `config/database.php` | Verifier host, dbname, username et password |
+| Page "Not Found" sur les routes | mod_rewrite desactive | `sudo a2enmod rewrite` puis `sudo systemctl restart apache2` |
+| Acces interdit (403) | Droits de fichiers | `sudo chown -R www-data:www-data /var/www/depistage` |
+| Erreur Twig | Dossier vendor absent | Relancer `composer install` |
 
 ---
 
