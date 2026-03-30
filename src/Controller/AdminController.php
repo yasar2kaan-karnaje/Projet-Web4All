@@ -381,18 +381,32 @@ class AdminController extends BaseController
     }
 
     /**
-     * Sanitise rÃ©cursivement un tableau de donnÃ©es issues de $_POST.
+     * Nettoie récursivement les données d'un tableau (typiquement $_POST).
+     * Applique un retrait des espaces et une conversion des caractères spéciaux en entités HTML.
+     * @param array $data Le tableau de données à sécuriser.
+     * @return array Le tableau nettoyé.
      */
     private function sanitizePostData(array $data): array
     {
         $sanitized = [];
+
+        // On parcourt chaque donnée du formulaire (clé => valeur)
         foreach ($data as $key => $value) {
+            
+            // SI la valeur est un sous-tableau (ex: adresses[])
             if (is_array($value)) {
+                // RÉCURSIVITÉ : La fonction s'appelle elle-même pour nettoyer l'intérieur
                 $sanitized[$key] = $this->sanitizePostData($value);
-            } else {
+            } 
+            // SINON c'est une valeur simple (texte, nombre...)
+            else {
+                // 1. (string) : On force le format texte
+                // 2. trim() : On retire les espaces inutiles autour
+                // 3. htmlspecialchars() : On neutralise les balises HTML (Protection XSS)
                 $sanitized[$key] = htmlspecialchars(trim((string)$value), ENT_QUOTES, 'UTF-8');
             }
         }
-        return $sanitized;
+
+        return $sanitized; // On renvoie le tableau 100% sécurisé
     }
 }
