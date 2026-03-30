@@ -44,27 +44,30 @@
 
                         <div class="carousel-slide">
                             <div class="stat-card carousel-card">
-                                <div class="stat-label" style="font-weight: 600; margin-bottom: 8px;">Top Wish-list</div>
-                                <ul style="padding-left: 20px; font-size: 0.9rem; color: var(--text-color);">
-                                    {% for top in stats.top_wishlist %}
-                                        <li>{{ top.titre|slice(0,30) }}{% if top.titre|length > 30 %}...{% endif %} ({{ top.nb }})</li>
-                                    {% else %}
-                                        <li>Aucune offre en wish-list</li>
-                                    {% endfor %}
-                                </ul>
+                                {% if stats.top_wishlist|length > 0 %}
+                                    {% set top = stats.top_wishlist|first %}
+                                    <div class="stat-number" style="color: var(--primary);">{{ top.nb }}</div>
+                                    <div class="stat-label" title="{{ top.titre }}">Top liste : {{ top.titre|length > 20 ? top.titre|slice(0, 20) ~ '...' : top.titre }}</div>
+                                {% else %}
+                                    <div class="stat-number" style="color: var(--primary);">0</div>
+                                    <div class="stat-label">Top Wish-list (Aucune)</div>
+                                {% endif %}
                             </div>
                         </div>
 
                         <div class="carousel-slide">
-                            <div class="stat-card carousel-card">
-                                <div class="stat-label" style="font-weight: 600; margin-bottom: 8px;">Répartition par durée</div>
-                                <ul style="padding-left: 20px; font-size: 0.9rem; color: var(--text-color);">
-                                    {% for rep in stats.repartition_duree %}
-                                        <li>{{ rep.duree }} : {{ rep.nb }} offre(s)</li>
+                            <div class="stat-card carousel-card" style="padding: 16px;">
+                                <div style="display: flex; gap: 24px; justify-content: center; align-items: flex-end; margin-bottom: 12px; width: 100%;">
+                                    {% for rep in stats.repartition_duree|slice(0, 3) %}
+                                        <div style="text-align: center;">
+                                            <div class="stat-number" style="color: var(--primary); font-size: 1.8rem; margin-bottom: 4px; line-height: 1;">{{ rep.nb }}</div>
+                                            <div style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 600;">{{ rep.duree }}</div>
+                                        </div>
                                     {% else %}
-                                        <li>Données insuffisantes</li>
+                                        <div class="stat-number" style="color: var(--primary);">0</div>
                                     {% endfor %}
-                                </ul>
+                                </div>
+                                <div class="stat-label" style="margin-top: 0;">Répartition par durée</div>
                             </div>
                         </div>
 

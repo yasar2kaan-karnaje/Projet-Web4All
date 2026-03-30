@@ -2,7 +2,7 @@
 
 return [
     'host' => '127.0.0.1',
-    'dbname' => '123',
+    'dbname' => 'nvbdd',
     'username' => 'root',
     'password' => '',
     'charset' => 'utf8mb4',
