@@ -143,7 +143,7 @@ class AdminController extends BaseController
     public function entrepriseCreate(): void
     {
         $this->requireRole('admin', 'pilote');
-        $data = $this->sanitizePostData($_POST);
+        $data = $this->GardienData($_POST);
         Entreprise::create($data);
         $this->redirect('/admin/entreprises?success=Entreprise créée');
     }
@@ -151,7 +151,7 @@ class AdminController extends BaseController
     public function entrepriseUpdate(string $id): void
     {
         $this->requireRole('admin', 'pilote');
-        $data = $this->sanitizePostData($_POST);
+        $data = $this->GardienData($_POST);
         Entreprise::update((int) $id, $data);
         $this->redirect('/admin/entreprises?success=Entreprise modifiée');
     }
@@ -181,7 +181,7 @@ class AdminController extends BaseController
     public function offreCreate(): void
     {
         $this->requireRole('admin', 'pilote');
-        $data = $this->sanitizePostData($_POST);
+        $data = $this->GardienData($_POST);
         Offre::create($data);
         $this->redirect('/admin/offres?success=Offre créée');
     }
@@ -189,7 +189,7 @@ class AdminController extends BaseController
     public function offreUpdate(string $id): void
     {
         $this->requireRole('admin', 'pilote');
-        $data = $this->sanitizePostData($_POST);
+        $data = $this->GardienData($_POST);
         Offre::update((int) $id, $data);
         $this->redirect('/admin/offres?success=Offre modifiée');
     }
@@ -224,7 +224,7 @@ class AdminController extends BaseController
     public function etudiantCreate(): void
     {
         $this->requireRole('admin', 'pilote');
-        $data = $this->sanitizePostData($_POST);
+        $data = $this->GardienData($_POST);
         $data['role'] = 'etudiant';
         $data['updated_by'] = $_SESSION['user']['id'];
         
@@ -240,7 +240,7 @@ class AdminController extends BaseController
     public function etudiantUpdate(string $id): void
     {
         $this->requireRole('admin', 'pilote');
-        $data = $this->sanitizePostData($_POST);
+        $data = $this->GardienData($_POST);
         $data['updated_by'] = $_SESSION['user']['id'];
         User::update((int) $id, $data);
         $this->redirect('/admin/etudiants?success=Étudiant modifié');
@@ -306,7 +306,7 @@ class AdminController extends BaseController
     public function piloteCreate(): void
     {
         $this->requireRole('admin');
-        $data = $this->sanitizePostData($_POST);
+        $data = $this->GardienData($_POST);
         $data['role'] = 'pilote';
         $data['is_recruteur'] = isset($data['is_recruteur']) ? 1 : 0;
         $data['updated_by'] = $_SESSION['user']['id'];
@@ -322,7 +322,7 @@ class AdminController extends BaseController
     public function piloteUpdate(string $id): void
     {
         $this->requireRole('admin');
-        $data = $this->sanitizePostData($_POST);
+        $data = $this->GardienData($_POST);
         $data['role'] = 'pilote';
         $data['is_recruteur'] = isset($data['is_recruteur']) ? 1 : 0;
         $data['updated_by'] = $_SESSION['user']['id'];
@@ -383,12 +383,12 @@ class AdminController extends BaseController
     /**
      * Sanitise rÃ©cursivement un tableau de donnÃ©es issues de $_POST.
      */
-    private function sanitizePostData(array $data): array
+    private function GardienData(array $data): array
     {
         $sanitized = [];
         foreach ($data as $key => $value) {
             if (is_array($value)) {
-                $sanitized[$key] = $this->sanitizePostData($value);
+                $sanitized[$key] = $this->GardienData($value);
             } else {
                 $sanitized[$key] = htmlspecialchars(trim((string)$value), ENT_QUOTES, 'UTF-8');
             }
