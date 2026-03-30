@@ -224,6 +224,119 @@
                     form.classList.add('was-validated');
                 }, false);
             });
+
+            // --- NOUVELLES FONCTIONNALITÉS ---
+
+            // Bouton de retour en haut de page
+            const scrollTopBtn = document.createElement('button');
+            scrollTopBtn.innerHTML = '&uarr;';
+            scrollTopBtn.id = 'scroll-top-btn';
+            scrollTopBtn.style.display = 'none';
+            scrollTopBtn.style.position = 'fixed';
+            scrollTopBtn.style.bottom = '20px';
+            scrollTopBtn.style.right = '20px';
+            scrollTopBtn.style.zIndex = '1000';
+            scrollTopBtn.style.padding = '10px 15px';
+            scrollTopBtn.style.fontSize = '20px';
+            scrollTopBtn.style.cursor = 'pointer';
+            scrollTopBtn.style.backgroundColor = 'var(--primary, #2A9D8F)';
+            scrollTopBtn.style.color = '#ffffff';
+            scrollTopBtn.style.border = 'none';
+            scrollTopBtn.style.borderRadius = '50%';
+            scrollTopBtn.style.boxShadow = '0 2px 5px rgba(0,0,0,0.3)';
+            scrollTopBtn.style.width = '45px';
+            scrollTopBtn.style.height = '45px';
+            scrollTopBtn.style.lineHeight = '24px';
+            scrollTopBtn.style.textAlign = 'center';
+            document.body.appendChild(scrollTopBtn);
+
+            // Apparition du bouton au défilement (quand le menu n'est plus visible, ~100px)
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 150) {
+                    scrollTopBtn.style.display = 'block';
+                } else {
+                    scrollTopBtn.style.display = 'none';
+                }
+            });
+
+            // Action de scroll
+            scrollTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // Validation JS spécifique pour le formulaire de candidature
+            const cvForm = document.querySelector('form[action*="/postuler"]');
+            if (cvForm) {
+                const inputNom = document.getElementById('nom');
+                const inputPrenom = document.getElementById('prenom');
+                const inputCourriel = document.getElementById('courriel');
+                const inputCv = document.getElementById('cv');
+                const inputMessage = document.getElementById('message_recruteur');
+
+                // Mettre le nom en majuscules
+                if (inputNom) {
+                    inputNom.addEventListener('input', () => {
+                        inputNom.value = inputNom.value.toUpperCase();
+                    });
+                }
+
+                cvForm.addEventListener('submit', function(e) {
+                    let isCvValid = true;
+                    
+                    const showError = (input, show) => {
+                        if (!input) return;
+                        const errorSpan = document.getElementById('error-' + input.id);
+                        if (errorSpan) {
+                            errorSpan.style.display = show ? 'block' : 'none';
+                        }
+                        if (show) isCvValid = false;
+                    };
+
+                    const validateRequired = (input) => {
+                        if (input && input.value.trim() === '') {
+                            showError(input, true);
+                        } else {
+                            showError(input, false);
+                        }
+                    };
+
+                    // Vérifications
+                    validateRequired(inputNom);
+                    validateRequired(inputPrenom);
+                    validateRequired(inputMessage);
+
+                    if (inputCourriel) {
+                        // Regex basique pour email
+                        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                        if (!emailRegex.test(inputCourriel.value.trim())) {
+                            showError(inputCourriel, true);
+                        } else {
+                            showError(inputCourriel, false);
+                        }
+                    }
+
+                    if (inputCv && inputCv.files.length > 0) {
+                        const file = inputCv.files[0];
+                        const validExtensions = ['pdf', 'doc', 'docx', 'odt', 'rtf', 'jpg', 'png'];
+                        const fileExtension = file.name.split('.').pop().toLowerCase();
+                        const maxSize = 2 * 1024 * 1024; // 2 Mo en octets
+
+                        if (!validExtensions.includes(fileExtension) || file.size > maxSize) {
+                            showError(inputCv, true);
+                            // On empêche le reset global d'erreur HTML5 si extension custom
+                        } else {
+                            showError(inputCv, false);
+                        }
+                    } else if (inputCv && inputCv.files.length === 0) {
+                        showError(inputCv, true);
+                    }
+
+                    if (!isCvValid) {
+                        e.preventDefault();
+                        e.stopImmediatePropagation();
+                    }
+                }, false);
+            }
         });
     </script>
 </body>
