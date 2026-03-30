@@ -381,18 +381,28 @@ class AdminController extends BaseController
     }
 
     /**
-     * Sanitise rÃ©cursivement un tableau de donnÃ©es issues de $_POST.
+     * Nettoie (sanitise) récursivement un tableau de données issues de $_POST.
+     * Cette méthode protège contre les failles XSS en convertissant les caractères spéciaux en entités HTML.
+     * @param array $data Le tableau de données brutes à nettoyer.
+     * @return array Le tableau nettoyé.
      */
     private function GardienData(array $data): array
     {
         $sanitized = [];
+
         foreach ($data as $key => $value) {
+            // Si la valeur est un tableau, on rappelle la fonction (récursivité)
             if (is_array($value)) {
                 $sanitized[$key] = $this->GardienData($value);
             } else {
+                // 1. (string)$value : Force la conversion en chaîne de caractères.
+                // 2. trim() : Supprime les espaces inutiles au début et à la fin.
+                // 3. htmlspecialchars() : Convertit les symboles (<, >, &, ", ') en entités HTML.
+                // ENT_QUOTES : Convertit les guillemets simples et doubles.
                 $sanitized[$key] = htmlspecialchars(trim((string)$value), ENT_QUOTES, 'UTF-8');
             }
         }
+
         return $sanitized;
     }
 }
