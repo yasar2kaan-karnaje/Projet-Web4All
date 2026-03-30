@@ -393,7 +393,7 @@ class AdminController extends BaseController
         // On parcourt chaque donnée du formulaire (clé => valeur)
         foreach ($data as $key => $value) {
             
-            // SI la valeur est un sous-tableau (ex: adresses[])
+            // SI la valeur est un sous-tableau
             if (is_array($value)) {
                 // RÉCURSIVITÉ : La fonction s'appelle elle-même pour nettoyer l'intérieur
                 $sanitized[$key] = $this->sanitizePostData($value);
@@ -407,6 +407,6 @@ class AdminController extends BaseController
             }
         }
 
-        return $sanitized; // On renvoie le tableau 100% sécurisé
+        return $sanitized; // On renvoie le tableau qui est 100% sécurisé
     }
 }
