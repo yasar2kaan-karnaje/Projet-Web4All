@@ -1,0 +1,6 @@
+User-agent: *
+Disallow: /admin/
+Disallow: /pilote/
+Disallow: /etudiant/
+
+Sitemap: https://www.depistage.eu/sitemap.xml

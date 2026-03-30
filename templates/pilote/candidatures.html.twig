@@ -1,0 +1,128 @@
+{% extends 'base.html.twig' %}
+
+{% set active_page = 'pilote-candidatures' %}
+
+{% block title %}Candidatures des élèves - Dépi'Stage{% endblock %}
+{% block description %}Suivi des candidatures des élèves - Espace Pilote Dépi'Stage{% endblock %}
+
+{% block content %}
+    <section class="section">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">Candidatures de mes élèves</h1>
+                <p class="page-subtitle">Consulter les offres auxquelles vos élèves ont postulé</p>
+            </div>
+
+            {# Filtres #}
+            <div class="search-bar">
+                <form action="/pilote/candidatures" method="get" style="display: flex; gap: 12px; width: 100%;">
+                    <input type="text" name="q" class="form-input" placeholder="Rechercher un étudiant..." value="{{ search }}">
+                    <select name="statut" class="form-input form-select">
+                        <option value="">Tous les statuts</option>
+                        <option value="en_attente"{% if statut == 'en_attente' %} selected{% endif %}>En attente</option>
+                        <option value="acceptee"{% if statut == 'acceptee' %} selected{% endif %}>Acceptée</option>
+                        <option value="refusee"{% if statut == 'refusee' %} selected{% endif %}>Refusée</option>
+                    </select>
+                    <button type="submit" class="btn btn-primary">Filtrer</button>
+                </form>
+            </div>
+
+            {# Statistiques #}
+            <div class="admin-stats" style="margin-bottom: 32px;">
+                <div class="stat-card">
+                    <div class="stat-number">{{ stats.nb_etudiants }}</div>
+                    <div class="stat-label">Étudiants suivis</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ stats.total_candidatures }}</div>
+                    <div class="stat-label">Candidatures totales</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ stats.en_attente }}</div>
+                    <div class="stat-label">En attente</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">{{ stats.acceptees }}</div>
+                    <div class="stat-label">Stages trouvés</div>
+                </div>
+            </div>
+
+            {# Liste des candidatures #}
+            {% if candidatures is not empty %}
+                <div class="table-container">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Étudiant</th>
+                                <th>Offre</th>
+                                <th>Entreprise</th>
+                                <th>Date candidature</th>
+                                <th>Documents</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in candidatures %}
+                                <tr>
+                                    <td>
+                                        <strong>{{ c.etudiant_prenom }} {{ c.etudiant_nom }}</strong><br>
+                                        <small>{{ c.etudiant_email }}</small>
+                                    </td>
+                                    <td>{{ c.offre_titre }}</td>
+                                    <td>{{ c.entreprise_nom }}</td>
+                                    <td>{{ c.date_candidature|date('d/m/Y') }}</td>
+                                    <td>
+                                        {% if c.cv_path %}
+                                            <a href="{{ c.cv_path }}" target="_blank" class="btn btn-outline btn-sm">Voir CV</a>
+                                        {% else %}
+                                            <span style="color:var(--text-muted);">Pas de CV</span>
+                                        {% endif %}
+                                        {% if c.lettre_motivation %}
+                                            <button onclick="alert('Lettre de motivation de {{ c.etudiant_prenom }} :\n\n{{ c.lettre_motivation|escape('js') }}')" class="btn btn-outline btn-sm">Lire LM</button>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if c.statut == 'en_attente' %}
+                                            <span class="status status-pending">En attente</span>
+                                        {% elseif c.statut == 'acceptee' %}
+                                            <span class="status status-accepted">Acceptée</span>
+                                        {% elseif c.statut == 'refusee' %}
+                                            <span class="status status-rejected">Refusée</span>
+                                        {% endif %}
+                                    </td>
+                                    <td style="display:flex; gap:8px;">
+                                        <a href="/offre/{{ c.offre_id }}" class="btn btn-outline btn-sm">Voir offre</a>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+
+                {# Pagination #}
+                {% if pagination.pages > 1 %}
+                    <div class="pagination">
+                        {% if pagination.current_page > 1 %}
+                            <a href="/pilote/candidatures?q={{ search }}&statut={{ statut }}&page={{ pagination.current_page - 1 }}" class="pagination-btn">&lsaquo;</a>
+                        {% else %}
+                            <span class="pagination-btn disabled">&lsaquo;</span>
+                        {% endif %}
+                        {% for i in 1..pagination.pages %}
+                            <a href="/pilote/candidatures?q={{ search }}&statut={{ statut }}&page={{ i }}" class="pagination-btn{% if i == pagination.current_page %} active{% endif %}">{{ i }}</a>
+                        {% endfor %}
+                        {% if pagination.current_page < pagination.pages %}
+                            <a href="/pilote/candidatures?q={{ search }}&statut={{ statut }}&page={{ pagination.current_page + 1 }}" class="pagination-btn">&rsaquo;</a>
+                        {% else %}
+                            <span class="pagination-btn disabled">&rsaquo;</span>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
+                    <p style="font-size: 1.1rem;">Aucune candidature trouvée.</p>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}

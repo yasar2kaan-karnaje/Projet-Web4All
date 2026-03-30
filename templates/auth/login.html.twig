@@ -1,0 +1,57 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion - Dépi'Stage{% endblock %}
+{% block description %}Connectez-vous à Dépi'Stage.{% endblock %}
+
+{% block content %}
+    <section class="section">
+        <div class="container" style="max-width: 400px;">
+            <div class="login-container">
+                <div class="login-header">
+                    <h1>Connexion</h1>
+                    <p>Accédez à votre compte Dépi'Stage</p>
+                </div>
+
+                {% if error %}
+                    <div class="alert alert-info" style="background: #fee; color: #c00; border-color: #fcc; margin-bottom: 16px;">
+                        {{ error }}
+                    </div>
+                {% endif %}
+
+                <form action="/login" method="post" class="login-form">
+                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                    <div class="form-group">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="email" class="form-input" placeholder="votre.email@viacesi.fr" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Mot de passe</label>
+                        <div style="position: relative;">
+                            <input type="password" id="login-password" name="password" class="form-input" placeholder="Votre mot de passe" required style="padding-right: 40px;">
+                            <button type="button" onclick="const p=document.getElementById('login-password'); p.type=p.type==='password'?'text':'password'; this.textContent=p.type==='password'?'👁️':'🔒';" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; font-size: 1.2rem;">👁️</button>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">Se connecter</button>
+                </form>
+
+                <div style="margin-top: 24px; text-align: center;">
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">
+                        Mot de passe oublié ? <a href="#">Réinitialiser</a>
+                    </p>
+                </div>
+
+                {# Accès démo avec les vrais comptes #}
+                <div style="margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--border-color);">
+                    <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 12px; text-align: center;">
+                        <strong>Comptes de démonstration :</strong>
+                    </p>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); display: flex; flex-direction: column; gap: 4px;">
+                        <div><strong>Admin :</strong> admin@depistage.fr / admin123</div>
+                        <div><strong>Pilote :</strong> m.dupont@cesi.fr / pilote123</div>
+                        <div><strong>Étudiant :</strong> a.dupont@viacesi.fr / etudiant123</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

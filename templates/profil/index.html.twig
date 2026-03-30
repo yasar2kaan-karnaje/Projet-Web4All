@@ -1,0 +1,141 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon Profil - Dépi'Stage{% endblock %}
+{% block description %}Consultez et gérez votre profil sur Dépi'Stage{% endblock %}
+
+{% block content %}
+    <section class="section">
+        <div class="container">
+
+            <div class="profil-page">
+
+                {# En-tête du profil #}
+                <div class="profil-header-card">
+                    <div class="profil-avatar-lg">
+                        {{ profil.prenom|first|upper }}
+                    </div>
+                    <div class="profil-header-info">
+                        <h1 class="profil-fullname">{{ profil.prenom }} {{ profil.nom }}</h1>
+                        <p class="profil-email">{{ profil.email }}</p>
+                        <span class="profil-role-badge profil-role-{{ profil.role }}">
+                            {% if profil.role == 'admin' %}
+                                Administrateur
+                            {% elseif profil.role == 'pilote' %}
+                                Pilote de promotion
+                            {% else %}
+                                Étudiant
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                {# Statistiques rapides #}
+                {% if profil.role == 'etudiant' %}
+                    <div class="profil-stats-grid">
+                        <div class="profil-stat-card">
+                            <div class="profil-stat-number">{{ stats.total_candidatures }}</div>
+                            <div class="profil-stat-label">Candidatures envoyées</div>
+                        </div>
+                        <div class="profil-stat-card">
+                            <div class="profil-stat-number stat-warning">{{ stats.en_attente }}</div>
+                            <div class="profil-stat-label">En attente</div>
+                        </div>
+                        <div class="profil-stat-card">
+                            <div class="profil-stat-number stat-success">{{ stats.acceptees }}</div>
+                            <div class="profil-stat-label">Acceptées</div>
+                        </div>
+                        <div class="profil-stat-card">
+                            <div class="profil-stat-number stat-danger">{{ stats.refusees }}</div>
+                            <div class="profil-stat-label">Refusées</div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                {# Informations détaillées #}
+                <div class="profil-details-card">
+                    <h2 class="profil-section-title">Informations personnelles</h2>
+
+                    <div class="profil-info-grid">
+                        <div class="profil-info-item">
+                            <span class="profil-info-label">Nom</span>
+                            <span class="profil-info-value">{{ profil.nom }}</span>
+                        </div>
+                        <div class="profil-info-item">
+                            <span class="profil-info-label">Prénom</span>
+                            <span class="profil-info-value">{{ profil.prenom }}</span>
+                        </div>
+                        <div class="profil-info-item">
+                            <span class="profil-info-label">Email</span>
+                            <span class="profil-info-value">{{ profil.email }}</span>
+                        </div>
+                        <div class="profil-info-item">
+                            <span class="profil-info-label">Rôle</span>
+                            <span class="profil-info-value">
+                                {% if profil.role == 'admin' %}Administrateur
+                                {% elseif profil.role == 'pilote' %}Pilote
+                                {% else %}Étudiant{% endif %}
+                            </span>
+                        </div>
+
+                        {% if profil.centre %}
+                            <div class="profil-info-item">
+                                <span class="profil-info-label">Centre</span>
+                                <span class="profil-info-value">{{ profil.centre }}</span>
+                            </div>
+                        {% endif %}
+
+                        {% if profil.promotion %}
+                            <div class="profil-info-item">
+                                <span class="profil-info-label">Promotion</span>
+                                <span class="profil-info-value">{{ profil.promotion }}</span>
+                            </div>
+                        {% endif %}
+
+                        {% if profil.role == 'pilote' and profil.promotions is defined %}
+                            <div class="profil-info-item profil-info-full">
+                                <span class="profil-info-label">Promotions gérées</span>
+                                <span class="profil-info-value">
+                                    {% if profil.promotions|length > 0 %}
+                                        {% for p in profil.promotions %}
+                                            <span class="profil-promo-tag">{{ p }}</span>
+                                        {% endfor %}
+                                    {% else %}
+                                        Aucune promotion assignée
+                                    {% endif %}
+                                </span>
+                            </div>
+                        {% endif %}
+
+                        {% if profil.entreprise_nom is defined and profil.entreprise_nom %}
+                            <div class="profil-info-item">
+                                <span class="profil-info-label">Entreprise</span>
+                                <span class="profil-info-value">{{ profil.entreprise_nom }}</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {# Liens rapides #}
+                <div class="profil-details-card">
+                    <h2 class="profil-section-title">Actions rapides</h2>
+                    <div class="profil-actions">
+                        {% if profil.role == 'etudiant' %}
+                            <a href="/etudiant/candidatures" class="btn btn-primary">Mes candidatures</a>
+                            <a href="/etudiant/wishlist" class="btn btn-outline">Ma wishlist</a>
+                            <a href="/offres" class="btn btn-outline">Voir les offres</a>
+                        {% elseif profil.role == 'pilote' %}
+                            <a href="/admin" class="btn btn-primary">Tableau de bord</a>
+                            <a href="/pilote/candidatures" class="btn btn-outline">Candidatures élèves</a>
+                            <a href="/admin/etudiants" class="btn btn-outline">Gérer les étudiants</a>
+                        {% elseif profil.role == 'admin' %}
+                            <a href="/admin" class="btn btn-primary">Tableau de bord</a>
+                            <a href="/admin/etudiants" class="btn btn-outline">Gérer les étudiants</a>
+                            <a href="/admin/pilotes" class="btn btn-outline">Gérer les pilotes</a>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+{% endblock %}

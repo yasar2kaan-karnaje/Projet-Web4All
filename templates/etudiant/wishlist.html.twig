@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% set active_page = 'etudiant-wishlist' %}
+
+{% block title %}Ma Wishlist - Dépi'Stage{% endblock %}
+{% block description %}Vos offres sauvegardées sur Dépi'Stage.{% endblock %}
+
+{% block content %}
+    <section class="section">
+        <div class="container">
+            <div class="page-header">
+                <h1 class="page-title">Ma Wishlist</h1>
+                <p class="page-subtitle">Gérez vos offres favorites</p>
+            </div>
+
+            {% if wishlist is not empty %}
+                <div class="offers-grid">
+                    {% for item in wishlist %}
+                        <article class="offer-card">
+                            <div class="offer-card-header">
+                                <div>
+                                    <div class="offer-title">{{ item.offre_titre }}</div>
+                                    <div class="offer-company">{{ item.entreprise_nom }}</div>
+                                </div>
+                                <form action="/wishlist/remove" method="post" style="display:inline;">
+                                    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
+                                    <input type="hidden" name="offre_id" value="{{ item.offre_id }}">
+                                    <input type="hidden" name="redirect" value="/etudiant/wishlist">
+                                    <button type="submit" class="wishlist-btn active" title="Retirer de la wishlist">&#9829;</button>
+                                </form>
+                            </div>
+                            <div class="offer-tags">
+                                {% if item.lieu %}<span class="tag">{{ item.lieu }}</span>{% endif %}
+                                {% if item.duree %}<span class="tag">{{ item.duree }}</span>{% endif %}
+                            </div>
+                            {% if item.offre_description %}
+                                <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">
+                                    {{ item.offre_description|length > 120 ? item.offre_description|slice(0, 120) ~ '...' : item.offre_description }}
+                                </p>
+                            {% endif %}
+                            <div class="offer-card-footer">
+                                <a href="/offre/{{ item.offre_id }}" class="btn btn-dark btn-sm">Voir l'offre</a>
+                            </div>
+                        </article>
+                    {% endfor %}
+                </div>
+
+                {# Pagination #}
+                {% if pagination.pages > 1 %}
+                    <div class="pagination">
+                        {% if pagination.current_page > 1 %}
+                            <a href="/etudiant/wishlist?page={{ pagination.current_page - 1 }}" class="pagination-btn">&lsaquo;</a>
+                        {% else %}
+                            <span class="pagination-btn disabled">&lsaquo;</span>
+                        {% endif %}
+                        {% for i in 1..pagination.pages %}
+                            <a href="/etudiant/wishlist?page={{ i }}" class="pagination-btn{% if i == pagination.current_page %} active{% endif %}">{{ i }}</a>
+                        {% endfor %}
+                        {% if pagination.current_page < pagination.pages %}
+                            <a href="/etudiant/wishlist?page={{ pagination.current_page + 1 }}" class="pagination-btn">&rsaquo;</a>
+                        {% else %}
+                            <span class="pagination-btn disabled">&rsaquo;</span>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            {% else %}
+                <div style="text-align: center; padding: 60px 20px; color: var(--text-muted);">
+                    <p style="font-size: 1.1rem;">Votre wishlist est vide.</p>
+                    <a href="/offres" class="btn btn-primary" style="margin-top: 16px;">Découvrir les offres</a>
+                </div>
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}
