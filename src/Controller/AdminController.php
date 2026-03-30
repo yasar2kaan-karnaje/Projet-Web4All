@@ -143,7 +143,7 @@ class AdminController extends BaseController
     public function entrepriseCreate(): void
     {
         $this->requireRole('admin', 'pilote');
-        $data = $this->sanitizePostData($_POST);
+        $data = $this->GardienData($_POST);
         Entreprise::create($data);
         $this->redirect('/admin/entreprises?success=Entreprise créée');
     }
@@ -151,7 +151,7 @@ class AdminController extends BaseController
     public function entrepriseUpdate(string $id): void
     {
         $this->requireRole('admin', 'pilote');
-        $data = $this->sanitizePostData($_POST);
+        $data = $this->GardienData($_POST);
         Entreprise::update((int) $id, $data);
         $this->redirect('/admin/entreprises?success=Entreprise modifiée');
     }
@@ -181,7 +181,7 @@ class AdminController extends BaseController
     public function offreCreate(): void
     {
         $this->requireRole('admin', 'pilote');
-        $data = $this->sanitizePostData($_POST);
+        $data = $this->GardienData($_POST);
         Offre::create($data);
         $this->redirect('/admin/offres?success=Offre créée');
     }
@@ -189,7 +189,7 @@ class AdminController extends BaseController
     public function offreUpdate(string $id): void
     {
         $this->requireRole('admin', 'pilote');
-        $data = $this->sanitizePostData($_POST);
+        $data = $this->GardienData($_POST);
         Offre::update((int) $id, $data);
         $this->redirect('/admin/offres?success=Offre modifiée');
     }
@@ -224,7 +224,7 @@ class AdminController extends BaseController
     public function etudiantCreate(): void
     {
         $this->requireRole('admin', 'pilote');
-        $data = $this->sanitizePostData($_POST);
+        $data = $this->GardienData($_POST);
         $data['role'] = 'etudiant';
         $data['updated_by'] = $_SESSION['user']['id'];
         
@@ -240,7 +240,7 @@ class AdminController extends BaseController
     public function etudiantUpdate(string $id): void
     {
         $this->requireRole('admin', 'pilote');
-        $data = $this->sanitizePostData($_POST);
+        $data = $this->GardienData($_POST);
         $data['updated_by'] = $_SESSION['user']['id'];
         User::update((int) $id, $data);
         $this->redirect('/admin/etudiants?success=Étudiant modifié');
@@ -306,7 +306,7 @@ class AdminController extends BaseController
     public function piloteCreate(): void
     {
         $this->requireRole('admin');
-        $data = $this->sanitizePostData($_POST);
+        $data = $this->GardienData($_POST);
         $data['role'] = 'pilote';
         $data['is_recruteur'] = isset($data['is_recruteur']) ? 1 : 0;
         $data['updated_by'] = $_SESSION['user']['id'];
@@ -322,7 +322,7 @@ class AdminController extends BaseController
     public function piloteUpdate(string $id): void
     {
         $this->requireRole('admin');
-        $data = $this->sanitizePostData($_POST);
+        $data = $this->GardienData($_POST);
         $data['role'] = 'pilote';
         $data['is_recruteur'] = isset($data['is_recruteur']) ? 1 : 0;
         $data['updated_by'] = $_SESSION['user']['id'];
@@ -381,32 +381,28 @@ class AdminController extends BaseController
     }
 
     /**
-     * Nettoie récursivement les données d'un tableau (typiquement $_POST).
-     * Applique un retrait des espaces et une conversion des caractères spéciaux en entités HTML.
-     * @param array $data Le tableau de données à sécuriser.
+     * Nettoie (sanitise) récursivement un tableau de données issues de $_POST.
+     * Cette méthode protège contre les failles XSS en convertissant les caractères spéciaux en entités HTML.
+     * @param array $data Le tableau de données brutes à nettoyer.
      * @return array Le tableau nettoyé.
      */
-    private function sanitizePostData(array $data): array
+    private function GardienData(array $data): array
     {
         $sanitized = [];
 
-        // On parcourt chaque donnée du formulaire (clé => valeur)
         foreach ($data as $key => $value) {
-            
-            // SI la valeur est un sous-tableau
+            // Si la valeur est un tableau, on rappelle la fonction (récursivité)
             if (is_array($value)) {
-                // RÉCURSIVITÉ : La fonction s'appelle elle-même pour nettoyer l'intérieur
-                $sanitized[$key] = $this->sanitizePostData($value);
-            } 
-            // SINON c'est une valeur simple (texte, nombre...)
-            else {
-                // 1. (string) : On force le format texte
-                // 2. trim() : On retire les espaces inutiles autour
-                // 3. htmlspecialchars() : On neutralise les balises HTML (Protection XSS)
+                $sanitized[$key] = $this->GardienData($value);
+            } else {
+                // 1. (string)$value : Force la conversion en chaîne de caractères.
+                // 2. trim() : Supprime les espaces inutiles au début et à la fin.
+                // 3. htmlspecialchars() : Convertit les symboles (<, >, &, ", ') en entités HTML.
+                // ENT_QUOTES : Convertit les guillemets simples et doubles.
                 $sanitized[$key] = htmlspecialchars(trim((string)$value), ENT_QUOTES, 'UTF-8');
             }
         }
 
-        return $sanitized; // On renvoie le tableau qui est 100% sécurisé
+        return $sanitized;
     }
 }

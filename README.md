@@ -13,7 +13,6 @@ Vous devez avoir les elements suivants installes sur votre machine (Linux, Ubunt
 - **Apache 2** avec les modules `mod_rewrite`, `mod_ssl` et `mod_expires`
 - **MySQL** ou **MariaDB**
 - **Git**
-- **Certbot** (pour generer un certificat HTTPS Let's Encrypt)
 
 Si certains composants manquent, voici comment les installer en une seule commande sur Ubuntu/Debian :
 
@@ -49,7 +48,7 @@ sudo chmod -R 755 /var/www/depistage
 Placez-vous dans le dossier du projet et lancez Composer :
 
 ```bash
-cd /var/www/depistage
+cd /var/www/depistage/Projet-Web4All
 sudo composer install
 ```
 
@@ -134,9 +133,9 @@ Collez le contenu suivant :
     ServerName depistage.eu
     ServerAlias www.depistage.eu
 
-    DocumentRoot /var/www/depistage/public
+    DocumentRoot /var/www/depistage/
 
-    <Directory /var/www/depistage/public>
+    <Directory /var/www/depistage>
         Options -Indexes +FollowSymLinks
         AllowOverride All
         Require all granted
@@ -199,10 +198,38 @@ sudo a2dissite 000-default.conf
 ### 5.5 Generer les certificats HTTPS
 
 ```bash
-sudo certbot --apache -d depistage.eu -d www.depistage.eu -d static.depistage.eu
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+-keyout /etc/ssl/private/apache-selfsigned.key \
+-out /etc/ssl/certs/apache-selfsigned.crt
 ```
 
+Modifiez votre fichier de configuration (ex: /etc/apache2/sites-available/depistage.conf) pour inclure le port 443 :
+```bash
+<VirtualHost *:443>
+    ServerName depistage.eu
+    ServerAlias www.depistage.eu static.depistage.eu
+    DocumentRoot /var/www/depistage/Projet-Web4All/public
+
+    SSLEngine on
+    SSLCertificateFile /etc/ssl/certs/apache-selfsigned.crt
+    SSLCertificateKeyFile /etc/ssl/private/apache-selfsigned.key
+
+    <Directory /var/www/depistage/Projet-Web4All/public>
+        AllowOverride All
+        Require all granted
+    </Directory>
+</VirtualHost>
+```
+
+
 ### 5.6 Redemarrer Apache pour appliquer les changements
+
+Activer les modules et redémarrer :
+```bash
+sudo a2enmod ssl
+sudo a2enmod rewrite
+sudo a2enmod expires
+```
 
 ```bash
 sudo systemctl restart apache2
@@ -368,7 +395,9 @@ sudo a2dissite 000-default.conf
 sudo systemctl restart apache2
 
 # Certificat HTTPS
-sudo certbot --apache -d depistage.eu -d www.depistage.eu -d static.depistage.eu
+sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
+-keyout /etc/ssl/private/apache-selfsigned.key \
+-out /etc/ssl/certs/apache-selfsigned.crt
 
 # Ouvrir dans le navigateur
 https://depistage.eu
