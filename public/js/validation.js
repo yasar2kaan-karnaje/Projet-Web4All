@@ -20,15 +20,20 @@ document.addEventListener('DOMContentLoaded', function() {
     // Validation JS spécifique pour le formulaire de candidature
     const cvForm = document.querySelector('form[action*="/postuler"]');
 
-    // Formatage global : Nom en MAJUSCULES, Prénom avec 1ère lettre en Majuscule
+    // Formatage global : Nom en MAJUSCULES, Prénom avec 1ère lettre en Majuscule, Lettres uniquement
     document.querySelectorAll('input[name="nom"], input[id="nom"], input[id="nom_entreprise"]').forEach(input => {
         input.addEventListener('input', function() {
+            // Supprime tout ce qui n'est pas : une lettre (y compris accents), un espace, un tiret ou une apostrophe
+            this.value = this.value.replace(/[^A-Za-zÀ-ÿ\s'-]/g, '');
+            // Mise en majuscules
             this.value = this.value.toUpperCase();
         });
     });
 
     document.querySelectorAll('input[name="prenom"], input[id="prenom"]').forEach(input => {
         input.addEventListener('input', function() {
+            // Supprime tout ce qui n'est pas : une lettre (y compris accents), un espace, un tiret ou une apostrophe
+            this.value = this.value.replace(/[^A-Za-zÀ-ÿ\s'-]/g, '');
             // Remplace la première lettre et les lettres après un espace ou un tiret par une majuscule
             this.value = this.value.replace(/(?:^|\s|-)\S/g, function(lettre) { 
                 return lettre.toUpperCase(); 
