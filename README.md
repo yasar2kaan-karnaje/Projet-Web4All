@@ -313,8 +313,8 @@ Les comptes doivent etre crees en base de donnees. Il n'y a pas de page d'inscri
 Les tests unitaires utilisent PHPUnit :
 
 ```bash
-cd /var/www/depistage
-./vendor/bin/phpunit tests/
+cd /var/www/depistage/Projet-Web4All
+php vendor/bin/phpunit --testdox
 ```
 
 ---
