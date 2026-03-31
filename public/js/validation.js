@@ -19,19 +19,29 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Validation JS spécifique pour le formulaire de candidature
     const cvForm = document.querySelector('form[action*="/postuler"]');
+
+    // Formatage global : Nom en MAJUSCULES, Prénom avec 1ère lettre en Majuscule
+    document.querySelectorAll('input[name="nom"], input[id="nom"], input[id="nom_entreprise"]').forEach(input => {
+        input.addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+    });
+
+    document.querySelectorAll('input[name="prenom"], input[id="prenom"]').forEach(input => {
+        input.addEventListener('input', function() {
+            // Remplace la première lettre et les lettres après un espace ou un tiret par une majuscule
+            this.value = this.value.replace(/(?:^|\s|-)\S/g, function(lettre) { 
+                return lettre.toUpperCase(); 
+            });
+        });
+    });
+
     if (cvForm) {
         const inputNom = document.getElementById('nom');
         const inputPrenom = document.getElementById('prenom');
         const inputCourriel = document.getElementById('courriel');
         const inputCv = document.getElementById('cv');
         const inputMessage = document.getElementById('message_recruteur');
-
-        // Mettre le nom en majuscules
-        if (inputNom) {
-            inputNom.addEventListener('input', () => {
-                inputNom.value = inputNom.value.toUpperCase();
-            });
-        }
 
         cvForm.addEventListener('submit', function(e) {
             let isCvValid = true;
