@@ -39,7 +39,7 @@
                         </label>
                         <div style="position: relative;">
                             <input type="password" id="password" name="password" class="form-input" {{ user ? '' : 'required' }} style="padding-right: 40px;">
-                            <button type="button" onclick="const p=document.getElementById('password'); const img=this.querySelector('img'); if(p.type==='password'){ p.type='text'; img.src='/logo/cadenas.png'; }else{ p.type='password'; img.src='/logo/oeil.png'; }" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer;">
+                            <button type="button" class="toggle-password-btn" style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer;">
                                 <img src="/logo/oeil.png" alt="Basculer mot de passe" style="width: 20px; height: 20px; opacity: 0.7; vertical-align: middle; transition: opacity 0.2s;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.7">
                             </button>
                         </div>
@@ -74,31 +74,6 @@
                             </select>
                         </div>
                     </div>
-                    
-                    {% if session.user.role != 'pilote' %}
-                    <script>
-                        // Filtrer les promotions par centre pour l'admin
-                        document.getElementById('centre').addEventListener('change', function() {
-                            const centreParam = this.value;
-                            const options = document.getElementById('promotion').options;
-                            for (let i = 1; i < options.length; i++) {
-                                if (centreParam === '' || options[i].getAttribute('data-centre') === centreParam) {
-                                    options[i].style.display = 'block';
-                                } else {
-                                    options[i].style.display = 'none';
-                                }
-                            }
-                            document.getElementById('promotion').value = '';
-                        });
-                        
-                        // Déclencher le filtre au chargement
-                        document.getElementById('centre').dispatchEvent(new Event('change'));
-                        {% if user and user.promotion %}
-                            // Restaurer la valeur si édition
-                            document.getElementById('promotion').value = "{{ user.promotion }}";
-                        {% endif %}
-                    </script>
-                    {% endif %}
 
                     <div style="margin-top: 16px;">
                         <button type="submit" class="btn btn-primary" style="width: 100%;">{{ user ? 'Enregistrer les modifications' : 'Ajouter le ' ~ type }}</button>

@@ -82,40 +82,7 @@
                 </div>
             </div>
 
-            <script>
-            (function() {
-                const track = document.getElementById('carousel-track');
-                const slides = track.querySelectorAll('.carousel-slide');
-                const prevBtn = document.getElementById('carousel-prev');
-                const nextBtn = document.getElementById('carousel-next');
-                const dots = document.querySelectorAll('.carousel-dot');
-                let current = 0;
-                const total = slides.length;
-                let autoPlayTimer;
 
-                function goTo(index) {
-                    if (index < 0) index = total - 1;
-                    if (index >= total) index = 0;
-                    current = index;
-                    track.style.transform = 'translateX(-' + (current * 100) + '%)';
-                    dots.forEach(function(d, i) {
-                        d.classList.toggle('active', i === current);
-                    });
-                }
-
-                prevBtn.addEventListener('click', function() { goTo(current - 1); resetAutoPlay(); });
-                nextBtn.addEventListener('click', function() { goTo(current + 1); resetAutoPlay(); });
-                dots.forEach(function(dot) {
-                    dot.addEventListener('click', function() { goTo(parseInt(this.dataset.index)); resetAutoPlay(); });
-                });
-
-                function resetAutoPlay() {
-                    clearInterval(autoPlayTimer);
-                    autoPlayTimer = setInterval(function() { goTo(current + 1); }, 5000);
-                }
-                resetAutoPlay();
-            })();
-            </script>
 
             {# Grille des offres #}
             {% if offres is not empty %}

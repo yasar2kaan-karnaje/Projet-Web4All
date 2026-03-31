@@ -111,29 +111,5 @@
         </div>
     </div>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        const modal = document.getElementById('lm-modal');
-        const modalBody = document.getElementById('lm-modal-body');
-        const modalClose = document.getElementById('modal-close');
 
-        document.querySelectorAll('.lm-toggle').forEach(function(btn) {
-            btn.addEventListener('click', function() {
-                var lmId = this.dataset.lmId;
-                var data = document.getElementById(lmId);
-                if (data) {
-                    modalBody.textContent = data.textContent;
-                    modal.classList.add('show');
-                }
-            });
-        });
-
-        if (modalClose) {
-            modalClose.addEventListener('click', function() { modal.classList.remove('show'); });
-        }
-        modal.addEventListener('click', function(e) {
-            if (e.target === modal) modal.classList.remove('show');
-        });
-    });
-    </script>
 {% endblock %}
