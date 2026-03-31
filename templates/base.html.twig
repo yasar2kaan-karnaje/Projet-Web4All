@@ -74,15 +74,15 @@
                 {% if is_logged_in %}
                     <div class="user-menu">
                         <button class="user-menu-toggle" id="user-menu-toggle">
-                            <span class="user-avatar">{{ user.prenom|first|upper }}</span>
-                            <span class="user-name">{{ user.prenom }}</span>
+                            <span class="user-avatar">{{ session.user.prenom|first|upper }}</span>
+                            <span class="user-name">{{ session.user.prenom }}</span>
                         </button>
                         <div class="user-dropdown" id="user-dropdown">
                             <div class="user-dropdown-header">
-                                <span class="user-avatar" style="width:36px;height:36px;">{{ user.prenom|first|upper }}</span>
+                                <span class="user-avatar" style="width:36px;height:36px;">{{ session.user.prenom|first|upper }}</span>
                                 <div>
-                                    <div style="font-weight:600;">{{ user.prenom }} {{ user.nom }}</div>
-                                    <div style="font-size:0.8rem;color:var(--text-muted);">{{ user.email }}</div>
+                                    <div style="font-weight:600;">{{ session.user.prenom }} {{ session.user.nom }}</div>
+                                    <div style="font-size:0.8rem;color:var(--text-muted);">{{ session.user.email }}</div>
                                 </div>
                             </div>
                             <a href="/profil" class="user-dropdown-item">
