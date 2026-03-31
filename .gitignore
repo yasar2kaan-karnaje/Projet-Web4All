@@ -3,3 +3,4 @@
 /.phpunit.result.cache
 /tmp_csrf.php
 /public/csrf_fix.php
+/config/database.php
