@@ -130,20 +130,13 @@ Collez le contenu suivant :
 
 ```apache
 <VirtualHost *:80>
-    ServerName depistage.eu
-    ServerAlias www.depistage.eu
+    ServerName localhost
+    DocumentRoot /var/www/depistage/Projet-Web4All/public
 
-    DocumentRoot /var/www/depistage/
-
-    <Directory /var/www/depistage>
-        Options -Indexes +FollowSymLinks
+    <Directory /var/www/depistage/Projet-Web4All/public>
         AllowOverride All
         Require all granted
     </Directory>
-
-    ErrorLog ${APACHE_LOG_DIR}/depistage_error.log
-    CustomLog ${APACHE_LOG_DIR}/depistage_access.log combined
-</VirtualHost>
 ```
 
 > Le `AllowOverride All` est indispensable pour que le fichier `.htaccess` du projet fonctionne (URL rewriting).
