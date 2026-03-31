@@ -184,15 +184,8 @@ class User {
         ];
     }
 
-    // ===================================
-    // CRUD
-    // ===================================
-
-    /**
-     * Crée un utilisateur + sa ligne dans la sous-table du rôle
-     */
-    public static function create(array $data): int
-    {
+    //Crée un utilisateur + sa ligne dans la sous-table du rôle renvoie son ID
+    public static function create(array $data): int {
         $db = Database::getInstance();
 
         // Résoudre le role_id
@@ -229,7 +222,8 @@ class User {
                 'user_id' => $userId,
                 'promotion' => $data['promotion'] ?? null,
             ]);
-        } elseif ($roleName === 'pilote') {
+        }
+        elseif ($roleName === 'pilote') {
             $stmtSub = $db->prepare('INSERT INTO pilotes (user_id, is_recruteur, entreprise_id) VALUES (:user_id, :is_recruteur, :entreprise_id)');
             $stmtSub->execute([
                 'user_id' => $userId,
@@ -240,7 +234,8 @@ class User {
             if (!empty($data['promotions'])) {
                 self::setPilotePromotionsId($userId, $data['promotions']);
             }
-        } elseif ($roleName === 'admin') {
+        }
+        elseif ($roleName === 'admin') {
             $stmtSub = $db->prepare('INSERT INTO administrateurs (user_id) VALUES (:user_id)');
             $stmtSub->execute(['user_id' => $userId]);
         }
@@ -248,11 +243,8 @@ class User {
         return $userId;
     }
 
-    /**
-     * Met à jour un utilisateur + sa sous-table
-     */
-    public static function update(int $id, array $data): bool
-    {
+    //Met à jour un utilisateur + sa sous-table renvoie un bool
+    public static function update(int $id, array $data): bool {
         $db = Database::getInstance();
 
         // --- Mise à jour de la table users ---
@@ -273,7 +265,8 @@ class User {
                 $fields[] = 'role_id = :role_id';
                 $params['role_id'] = $roleId;
             }
-        } elseif (isset($data['role_id'])) {
+        }
+        elseif (isset($data['role_id'])) {
             $fields[] = 'role_id = :role_id';
             $params['role_id'] = (int) $data['role_id'];
         }
@@ -345,29 +338,18 @@ class User {
                 self::setPilotePromotionsId($id, $data['promotions']);
             }
         }
-
         return $result;
     }
 
-    /**
-     * Supprime un utilisateur (CASCADE supprime la sous-table)
-     */
-    public static function delete(int $id): bool
-    {
+    //Supprime un utilisateur (CASCADE supprime la sous-table)
+    public static function delete(int $id): bool {
         $db = Database::getInstance();
         $stmt = $db->prepare('DELETE FROM users WHERE id = :id');
         return $stmt->execute(['id' => $id]);
     }
 
-    // ===================================
-    // AUTHENTIFICATION
-    // ===================================
-
-    /**
-     * Vérifie le mot de passe
-     */
-    public static function verifyPassword(string $email, string $password): ?array
-    {
+    //Vérifie le mot de passe et renvoie le tableau du user si c'est bon
+    public static function verifyPassword(string $email, string $password): ?array {
         $user = self::findByEmail($email);
         if ($user && password_verify($password, $user['password'])) {
             return $user;
@@ -375,28 +357,15 @@ class User {
         return null;
     }
 
-    // ===================================
-    // COMPTEURS
-    // ===================================
-
-    /**
-     * Compte les utilisateurs par rôle
-     */
-    public static function countByRole(string $role): int
-    {
+    //Compte les utilisateurs par rôle et revnoie le nombre
+    public static function countByRole(string $role): int {
         $db = Database::getInstance();
         $stmt = $db->prepare('SELECT COUNT(*) FROM users u JOIN roles r ON u.role_id = r.id WHERE r.nom = :role');
         $stmt->execute(['role' => $role]);
         return (int) $stmt->fetchColumn();
     }
 
-    // ===================================
-    // GESTION DES PROMOTIONS PILOTE
-    // ===================================
-
-    /**
-     * Récupère les promotions d'un pilote
-     */
+    //Récupère les promotions d'un pilote
     public static function getPilotePromotions(int $piloteId): array
     {
         $db = Database::getInstance();
