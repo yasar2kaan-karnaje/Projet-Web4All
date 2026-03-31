@@ -143,7 +143,7 @@ class AdminController extends BaseController
     public function entrepriseCreate(): void
     {
         $this->requireRole('admin', 'pilote');
-        $data = $this->GardienData($_POST);
+        $data = $this->sanitizePostData($_POST);
         Entreprise::create($data);
         $this->redirect('/admin/entreprises?success=Entreprise créée');
     }
@@ -151,7 +151,7 @@ class AdminController extends BaseController
     public function entrepriseUpdate(string $id): void
     {
         $this->requireRole('admin', 'pilote');
-        $data = $this->GardienData($_POST);
+        $data = $this->sanitizePostData($_POST);
         Entreprise::update((int) $id, $data);
         $this->redirect('/admin/entreprises?success=Entreprise modifiée');
     }
@@ -181,7 +181,7 @@ class AdminController extends BaseController
     public function offreCreate(): void
     {
         $this->requireRole('admin', 'pilote');
-        $data = $this->GardienData($_POST);
+        $data = $this->sanitizePostData($_POST);
         Offre::create($data);
         $this->redirect('/admin/offres?success=Offre créée');
     }
@@ -189,7 +189,7 @@ class AdminController extends BaseController
     public function offreUpdate(string $id): void
     {
         $this->requireRole('admin', 'pilote');
-        $data = $this->GardienData($_POST);
+        $data = $this->sanitizePostData($_POST);
         Offre::update((int) $id, $data);
         $this->redirect('/admin/offres?success=Offre modifiée');
     }
@@ -224,7 +224,14 @@ class AdminController extends BaseController
     public function etudiantCreate(): void
     {
         $this->requireRole('admin', 'pilote');
-        $data = $this->GardienData($_POST);
+        $data = $this->sanitizePostData($_POST);
+
+        // Vérification de l'existence de l'email
+        if (!empty($data['email']) && User::findByEmail($data['email'])) {
+            $this->redirect('/admin/etudiant/creer?error=' . urlencode('Cet email est déjà utilisé par un autre compte'));
+            return;
+        }
+
         $data['role'] = 'etudiant';
         $data['updated_by'] = $_SESSION['user']['id'];
         
@@ -240,7 +247,17 @@ class AdminController extends BaseController
     public function etudiantUpdate(string $id): void
     {
         $this->requireRole('admin', 'pilote');
-        $data = $this->GardienData($_POST);
+        $data = $this->sanitizePostData($_POST);
+
+        // Vérification de l'existence de l'email s'il a été modifié
+        if (!empty($data['email'])) {
+            $existingUser = User::findByEmail($data['email']);
+            if ($existingUser && (int)$existingUser['id'] !== (int)$id) {
+                $this->redirect('/admin/etudiant/' . $id . '/modifier?error=' . urlencode('Cet email est déjà utilisé par un autre compte'));
+                return;
+            }
+        }
+
         $data['updated_by'] = $_SESSION['user']['id'];
         User::update((int) $id, $data);
         $this->redirect('/admin/etudiants?success=Étudiant modifié');
@@ -306,7 +323,14 @@ class AdminController extends BaseController
     public function piloteCreate(): void
     {
         $this->requireRole('admin');
-        $data = $this->GardienData($_POST);
+        $data = $this->sanitizePostData($_POST);
+
+        // Vérification de l'existence de l'email
+        if (!empty($data['email']) && User::findByEmail($data['email'])) {
+            $this->redirect('/admin/pilote/creer?error=' . urlencode('Cet email est déjà utilisé par un autre compte'));
+            return;
+        }
+
         $data['role'] = 'pilote';
         $data['is_recruteur'] = isset($data['is_recruteur']) ? 1 : 0;
         $data['updated_by'] = $_SESSION['user']['id'];
@@ -322,7 +346,17 @@ class AdminController extends BaseController
     public function piloteUpdate(string $id): void
     {
         $this->requireRole('admin');
-        $data = $this->GardienData($_POST);
+        $data = $this->sanitizePostData($_POST);
+
+        // Vérification de l'existence de l'email s'il a été modifié
+        if (!empty($data['email'])) {
+            $existingUser = User::findByEmail($data['email']);
+            if ($existingUser && (int)$existingUser['id'] !== (int)$id) {
+                $this->redirect('/admin/pilote/' . $id . '/modifier?error=' . urlencode('Cet email est déjà utilisé par un autre compte'));
+                return;
+            }
+        }
+
         $data['role'] = 'pilote';
         $data['is_recruteur'] = isset($data['is_recruteur']) ? 1 : 0;
         $data['updated_by'] = $_SESSION['user']['id'];
@@ -381,28 +415,18 @@ class AdminController extends BaseController
     }
 
     /**
-     * Nettoie (sanitise) récursivement un tableau de données issues de $_POST.
-     * Cette méthode protège contre les failles XSS en convertissant les caractères spéciaux en entités HTML.
-     * @param array $data Le tableau de données brutes à nettoyer.
-     * @return array Le tableau nettoyé.
+     * Sanitise rÃ©cursivement un tableau de donnÃ©es issues de $_POST.
      */
-    private function GardienData(array $data): array
+    private function sanitizePostData(array $data): array
     {
         $sanitized = [];
-
         foreach ($data as $key => $value) {
-            // Si la valeur est un tableau, on rappelle la fonction (récursivité)
             if (is_array($value)) {
-                $sanitized[$key] = $this->GardienData($value);
+                $sanitized[$key] = $this->sanitizePostData($value);
             } else {
-                // 1. (string)$value : Force la conversion en chaîne de caractères.
-                // 2. trim() : Supprime les espaces inutiles au début et à la fin.
-                // 3. htmlspecialchars() : Convertit les symboles (<, >, &, ", ') en entités HTML.
-                // ENT_QUOTES : Convertit les guillemets simples et doubles.
                 $sanitized[$key] = htmlspecialchars(trim((string)$value), ENT_QUOTES, 'UTF-8');
             }
         }
-
         return $sanitized;
     }
 }
