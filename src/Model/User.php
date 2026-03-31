@@ -4,18 +4,10 @@ namespace App\Model;
 
 use PDO;
 
-class User
-{
-    // ===================================
-    // REQUÊTES DE BASE (SELECT)
-    // ===================================
+class User {
 
-    /**
-     * Requête SELECT de base avec JOINs sur les sous-tables
-     * Renvoie tous les champs de users + les champs spécifiques au rôle
-     */
-    private static function baseSelectQuery(): string
-    {
+    //Renvoie en string la requete SQL de tous les champs de users + les champs spécifiques au rôle    
+    private static function baseSelectQuery(): string {
         return "SELECT u.*, r.nom AS role, r.label AS role_label,
                        et.promotion,
                        p.is_recruteur, p.entreprise_id, ent.nom AS entreprise_nom,
@@ -29,11 +21,8 @@ class User
                 LEFT JOIN users updater ON u.updated_by = updater.id";
     }
 
-    /**
-     * Trouve un utilisateur par email (login)
-     */
-    public static function findByEmail(string $email): ?array
-    {
+    //Trouve un utilisateur par email et renvoie le tableau des infos du users
+    public static function findByEmail(string $email): ?array {
         $db = Database::getInstance();
         $sql = self::baseSelectQuery() . " WHERE u.email = :email";
         $stmt = $db->prepare($sql);
@@ -42,11 +31,8 @@ class User
         return $user ?: null;
     }
 
-    /**
-     * Trouve un utilisateur par ID (avec ses promotions si pilote)
-     */
-    public static function findById(int $id): ?array
-    {
+    //Trouve un utilisateur par ID (avec ses promotions si pilote) et renvoie le tableau
+    public static function findById(int $id): ?array {
         $db = Database::getInstance();
         $sql = self::baseSelectQuery() . " WHERE u.id = :id";
         $stmt = $db->prepare($sql);
@@ -64,11 +50,8 @@ class User
         return $user;
     }
 
-    /**
-     * Récupère tous les utilisateurs d'un rôle donné avec pagination
-     */
-    public static function findByRole(string $role, int $page = 1, int $perPage = 10, string $search = ''): array
-    {
+    //Récupère tous les utilisateurs d'un rôle donné avec pagination et les mets dans un tableau
+    public static function findByRole(string $role, int $page = 1, int $perPage = 10, string $search = ''): array {
         $db = Database::getInstance();
         $offset = ($page - 1) * $perPage;
 
@@ -95,7 +78,8 @@ class User
                     JOIN roles r ON u.role_id = r.id
                     JOIN etudiants et ON u.id = et.user_id
                     $where ORDER BY u.nom ASC LIMIT :limit OFFSET :offset";
-        } elseif ($role === 'pilote') {
+        }
+        elseif ($role === 'pilote') {
             $sql = "SELECT u.*, r.nom AS role, r.label AS role_label, 
                     p.is_recruteur, p.entreprise_id, ent.nom AS entreprise_nom,
                     (SELECT GROUP_CONCAT(rp.nom SEPARATOR ', ') 
@@ -107,7 +91,8 @@ class User
                     JOIN pilotes p ON u.id = p.user_id
                     LEFT JOIN entreprises ent ON p.entreprise_id = ent.id
                     $where ORDER BY u.nom ASC LIMIT :limit OFFSET :offset";
-        } else {
+        }
+        else {
             $sql = "SELECT u.*, r.nom AS role, r.label AS role_label 
                     FROM users u 
                     JOIN roles r ON u.role_id = r.id 
@@ -130,11 +115,8 @@ class User
         ];
     }
 
-    /**
-     * Récupère les étudiants visibles par un pilote (filtrage par centre + promotions)
-     */
-    public static function findStudentsByPilote(int $piloteId, int $page = 1, int $perPage = 10, string $search = ''): array
-    {
+    //Récupère les étudiants visibles par un pilote (filtrage par centre + promotions)
+    public static function findStudentsByPilote(int $piloteId, int $page = 1, int $perPage = 10, string $search = ''): array {
         $db = Database::getInstance();
         $offset = ($page - 1) * $perPage;
 

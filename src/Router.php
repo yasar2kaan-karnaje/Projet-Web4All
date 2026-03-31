@@ -2,36 +2,29 @@
 
 namespace App;
 
-class Router
-{
+class Router {
     private array $routes = [];
 
-    /**
-     * Enregistre une route GET
-     */
-    public function get(string $path, array $handler): void
-    {
+    //Enregistre une route GET
+    public function get(string $path, array $handler): void {
         $this->routes['GET'][$path] = $handler;
     }
 
-    /**
-     * Enregistre une route POST
-     */
-    public function post(string $path, array $handler): void
-    {
+    
+    //Enregistre une route POST
+    public function post(string $path, array $handler): void {
         $this->routes['POST'][$path] = $handler;
     }
 
-    /**
-     * Résout la requête et appelle le bon contrôleur
-     */
+    //Résout la requête et appelle le bon contrôleur
     public function resolve(string $url, string $method): void
     {
         // Nettoyer l'URL
         $url = trim($url, '/');
         if ($url === '') {
             $url = '/';
-        } else {
+        }
+        else {
             $url = '/' . $url;
         }
 
@@ -70,7 +63,8 @@ class Router
             $twig->addGlobal('role', $_SESSION['user']['role'] ?? 'guest');
             $twig->addGlobal('is_logged_in', isset($_SESSION['user']));
             echo $twig->render('errors/404.html.twig');
-        } catch (\Throwable $e) {
+        } 
+        catch (\Throwable $e) {
             echo '<h1>404 - Page non trouvée</h1>';
             echo '<p>La page demandée n\'existe pas. <a href="/">Retour à l\'accueil</a></p>';
         }
