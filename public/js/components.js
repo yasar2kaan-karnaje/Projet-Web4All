@@ -126,5 +126,54 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    // 5. GESTION DES NOTIFICATIONS D'ERREURS ET SUCCÈS (Depuis l'URL)
+    const params = new URLSearchParams(window.location.search);
+    const msgErreur = params.get('error');
+    const msgSucces = params.get('success');
+
+    if (msgErreur || msgSucces) {
+        const type = msgErreur ? 'error' : 'success';
+        const message = msgErreur || msgSucces;
+        
+        const boiteAlerte = document.createElement('div');
+        // Styles de l'alerte
+        boiteAlerte.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            background: ${type === 'error' ? '#ffeeee' : '#eeffee'};
+            color: ${type === 'error' ? '#cc0000' : '#007700'};
+            border-left: 5px solid ${type === 'error' ? '#cc0000' : '#007700'};
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            z-index: 10000;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-family: 'Inter', system-ui, sans-serif;
+        `;
+        boiteAlerte.textContent = message;
+        document.body.appendChild(boiteAlerte);
+
+        // Animation d'apparition
+        requestAnimationFrame(() => {
+            boiteAlerte.style.opacity = '1';
+            boiteAlerte.style.transform = 'translateX(0)';
+        });
+
+        // Disparition après 5 secondes
+        setTimeout(() => {
+            boiteAlerte.style.opacity = '0';
+            boiteAlerte.style.transform = 'translateX(100%)';
+            setTimeout(() => boiteAlerte.remove(), 400);
+        }, 5000);
+
+        // Nettoyer l'URL pour ne pas réafficher le message si on rafraîchit la page
+        const nouvelleUrl = window.location.protocol + "//" + window.location.host + window.location.pathname;
+        window.history.replaceState({path: nouvelleUrl}, '', nouvelleUrl);
+    }
 
 });
