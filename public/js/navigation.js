@@ -16,4 +16,19 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Menu utilisateur dropdown
+    const userToggle = document.getElementById('user-menu-toggle');
+    const userDropdown = document.getElementById('user-dropdown');
+    if (userToggle && userDropdown) {
+        userToggle.addEventListener('click', function (e) {
+            e.stopPropagation();
+            userDropdown.classList.toggle('show');
+        });
+        document.addEventListener('click', function (e) {
+            if (!userToggle.contains(e.target) && !userDropdown.contains(e.target)) {
+                userDropdown.classList.remove('show');
+            }
+        });
+    }
+
 });
