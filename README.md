@@ -48,7 +48,7 @@ sudo chmod -R 755 /var/www/depistage
 Placez-vous dans le dossier du projet et lancez Composer :
 
 ```bash
-cd /var/www/depistage/Projet-Web4All
+cd /var/www/depistage
 sudo composer install
 ```
 
@@ -131,9 +131,9 @@ Collez le contenu suivant :
 ```apache
 <VirtualHost *:80>
     ServerName localhost
-    DocumentRoot /var/www/depistage/Projet-Web4All/public
+    DocumentRoot /var/www/depistage/public
 
-    <Directory /var/www/depistage/Projet-Web4All/public>
+    <Directory /var/www/depistage/public>
         AllowOverride All
         Require all granted
     </Directory>
@@ -199,15 +199,15 @@ sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
 Modifiez votre fichier de configuration (ex: /etc/apache2/sites-available/depistage.conf) pour inclure le port 443 :
 ```bash
 <VirtualHost *:443>
-    ServerName depistage.eu
+    ServerName localhost
     ServerAlias www.depistage.eu static.depistage.eu
-    DocumentRoot /var/www/depistage/Projet-Web4All/public
+    DocumentRoot /var/www/depistage/public
 
     SSLEngine on
     SSLCertificateFile /etc/ssl/certs/apache-selfsigned.crt
     SSLCertificateKeyFile /etc/ssl/private/apache-selfsigned.key
 
-    <Directory /var/www/depistage/Projet-Web4All/public>
+    <Directory /var/www/depistage/public>
         AllowOverride All
         Require all granted
     </Directory>
@@ -306,7 +306,7 @@ Les comptes doivent etre crees en base de donnees. Il n'y a pas de page d'inscri
 Les tests unitaires utilisent PHPUnit :
 
 ```bash
-cd /var/www/depistage/Projet-Web4All
+cd /var/www/depistage
 php vendor/bin/phpunit --testdox
 ```
 
@@ -315,7 +315,7 @@ php vendor/bin/phpunit --testdox
 ## 10. Structure du projet (pour reference)
 
 ```
-Projet-Web4All/
+depistage/
 |-- config/
 |   |-- database.php
 |
