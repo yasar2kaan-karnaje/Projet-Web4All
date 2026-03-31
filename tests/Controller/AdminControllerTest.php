@@ -3,9 +3,12 @@
 namespace Tests\Controller;
 
 use PHPUnit\Framework\TestCase;
+use PHPUnit\Framework\Attributes\TestDox;
 
+#[TestDox('Contrôleur Administrateur (AdminController)')]
 class AdminControllerTest extends TestCase
 {
+    #[TestDox('Le contrôleur Admin hérite bien du contrôleur de base')]
     public function testAdminControllerInheritsBaseController()
     {
         // Instanciation simple pour s'assurer que la classe existe et hérite correctement sans lever d'erreur
