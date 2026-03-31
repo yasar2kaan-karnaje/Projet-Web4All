@@ -14,6 +14,6 @@ class DatabaseTest extends TestCase
         $this->assertInstanceOf(PDO::class, $instance1);
 
         $instance2 = Database::getInstance();
-        $this->assertSame($instance1, $instance2, 'Database::getInstance should return the same singleton instance.');
+        $this->assertSame($instance1, $instance2, 'Database::getInstance doit renvoyer la même instance');
     }
 }
