@@ -229,7 +229,19 @@ sudo a2enmod expires
 sudo systemctl restart apache2
 ```
 
----
+### 5.7 BONNUS Activer le PWA
+
+Mettre le lien ci-dessous dans l'url :
+```bash
+chrome://flags/#unsafely-treat-insecure-origin-as-secure
+```
+Une ligne jaune va apparaitre il faudra ajouter ce lien dedans : 
+```bash
+http://depistage.eu,https//depistage.eu,https://127.0.0.1
+```
+Ensuite une fois cela fait vous devez installer l'application en suivant ses instructions : 
+f12 : applications/service workers -> Cocher 'update on reload'.
+Ensuite cliquer sur l'icone télécharger à droite de votre url.
 
 ## 6. Configurer le fichier hosts (acces en local)
 
