@@ -275,8 +275,6 @@ COMMIT;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-
-
 -- PEUPLEMENT
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -333,23 +331,23 @@ INSERT INTO roles (id, nom, label) VALUES
 INSERT INTO centres (id, nom) VALUES
 (1, 'Paris'), (2, 'Lyon'), (3, 'Bordeaux');
 
--- 4. Création des Entreprises (15 entreprises)
-INSERT INTO entreprises (id, nom, secteur, localisation, description) VALUES
-(1, 'TechCorp', 'Informatique', 'Paris', 'ESN leader du marché de la tech.'),
-(2, 'DataForge', 'Data Science', 'Lyon', 'Start-up spécialisée en Intelligence Artificielle.'),
-(3, 'WebMakerZ', 'Web', 'Bordeaux', 'Agence web de création de sites vitrines.'),
-(4, 'SecurIT', 'Cybersécurité', 'Paris', 'Expert en sécurité des systèmes d information.'),
-(5, 'CloudSys', 'Cloud', 'Lyon', 'Hébergement et architecture Cloud.'),
-(6, 'GreenEnergy', 'Énergie', 'Nantes', 'Solutions informatiques pour la transition écologique.'),
-(7, 'HealthTech', 'Santé', 'Lille', 'Développement de logiciels pour le milieu hospitalier.'),
-(8, 'FinTech Hub', 'Finance', 'Paris', 'Start-up innovante dans la gestion de patrimoine.'),
-(9, 'AeroDev', 'Aéronautique', 'Toulouse', 'Conception de logiciels embarqués pour l aviation.'),
-(10, 'AutoDrive', 'Automobile', 'Strasbourg', 'Recherche et développement sur les véhicules autonomes.'),
-(11, 'AgriData', 'Agriculture', 'Rennes', 'Analyse de données pour l agriculture connectée.'),
-(12, 'LogistiX', 'Logistique', 'Marseille', 'Optimisation des chaînes d approvisionnement par l IA.'),
-(13, 'EduSmart', 'Éducation', 'Bordeaux', 'Plateforme de e-learning adaptative.'),
-(14, 'RetailSoft', 'E-commerce', 'Paris', 'Solutions ERP pour les grandes enseignes de distribution.'),
-(15, 'GameStudio', 'Jeux Vidéo', 'Montpellier', 'Studio indépendant de développement de jeux.');
+-- 4. Création des Entreprises (15 entreprises avec taille, email et tel)
+INSERT INTO entreprises (id, nom, secteur, localisation, description, taille, email_contact, tel_contact) VALUES
+(1, 'TechCorp', 'Informatique', 'Paris', 'ESN leader du marché de la tech.', 'Grande Entreprise', 'contact@techcorp.fr', '01 02 03 04 05'),
+(2, 'DataForge', 'Data Science', 'Lyon', 'Start-up spécialisée en Intelligence Artificielle.', 'TPE', 'hello@dataforge.fr', '04 12 23 34 45'),
+(3, 'WebMakerZ', 'Web', 'Bordeaux', 'Agence web de création de sites vitrines.', 'PME', 'agence@webmakerz.com', '05 22 33 44 55'),
+(4, 'SecurIT', 'Cybersécurité', 'Paris', 'Expert en sécurité des systèmes d information.', 'ETI', 'contact@securit.fr', '01 44 55 66 77'),
+(5, 'CloudSys', 'Cloud', 'Lyon', 'Hébergement et architecture Cloud.', 'PME', 'support@cloudsys.fr', '04 88 99 00 11'),
+(6, 'GreenEnergy', 'Énergie', 'Nantes', 'Solutions informatiques pour la transition écologique.', 'Grande Entreprise', 'rh@greenenergy.com', '02 11 22 33 44'),
+(7, 'HealthTech', 'Santé', 'Lille', 'Développement de logiciels pour le milieu hospitalier.', 'ETI', 'contact@healthtech.fr', '03 55 66 77 88'),
+(8, 'FinTech Hub', 'Finance', 'Paris', 'Start-up innovante dans la gestion de patrimoine.', 'TPE', 'hello@fintechhub.fr', '01 99 88 77 66'),
+(9, 'AeroDev', 'Aéronautique', 'Toulouse', 'Conception de logiciels embarqués pour l aviation.', 'Grande Entreprise', 'recrutement@aerodev.com', '05 10 20 30 40'),
+(10, 'AutoDrive', 'Automobile', 'Strasbourg', 'Recherche et développement sur les véhicules autonomes.', 'ETI', 'contact@autodrive.fr', '03 90 80 70 60'),
+(11, 'AgriData', 'Agriculture', 'Rennes', 'Analyse de données pour l agriculture connectée.', 'PME', 'info@agridata.fr', '02 40 50 60 70'),
+(12, 'LogistiX', 'Logistique', 'Marseille', 'Optimisation des chaînes d approvisionnement par l IA.', 'ETI', 'contact@logistix.com', '04 70 80 90 00'),
+(13, 'EduSmart', 'Éducation', 'Bordeaux', 'Plateforme de e-learning adaptative.', 'TPE', 'hello@edusmart.fr', '05 15 25 35 45'),
+(14, 'RetailSoft', 'E-commerce', 'Paris', 'Solutions ERP pour les grandes enseignes de distribution.', 'Grande Entreprise', 'rh@retailsoft.com', '01 50 60 70 80'),
+(15, 'GameStudio', 'Jeux Vidéo', 'Montpellier', 'Studio indépendant de développement de jeux.', 'PME', 'jobs@gamestudio.fr', '04 20 30 40 50');
 
 -- 5. Création des Offres (15 offres : 3 par entreprise pour les 5 premières)
 INSERT INTO offres (id, titre, description, competences, remuneration, duree, lieu, entreprise_id) VALUES
@@ -369,42 +367,49 @@ INSERT INTO offres (id, titre, description, competences, remuneration, duree, li
 (14, 'DevOps', 'CI/CD et Docker', 'Docker, GitLab CI', '1350€/mois', '6 mois', 'Lyon', 5),
 (15, 'Architecte AWS', 'Design d architecture', 'AWS', '1500€/mois', '6 mois', 'Lyon', 5);
 
--- 6. Création des Utilisateurs avec le nouveau mot de passe et noms formatés
+-- 6. Création des Utilisateurs
 
 -- -> Administrateur (1)
-INSERT INTO users (id, nom, prenom, email, password, role_id) VALUES
-(1, 'DUPONT', 'Super', 'super.dupont@test.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 1);
+INSERT INTO users (id, nom, prenom, email, password, role_id, centre) VALUES
+(1, 'ADMIN', 'Super', 'super.admin@test.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 1, NULL);
 INSERT INTO administrateurs (user_id) VALUES (1);
 
--- -> Pilotes (3)
-INSERT INTO users (id, nom, prenom, email, password, role_id) VALUES
-(2, 'MARTIN', 'Paul', 'paul.martin@cesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 2),
-(3, 'BERNARD', 'Lucie', 'lucie.bernard@cesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 2),
-(4, 'THOMAS', 'Marc', 'marc.thomas@cesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 2);
-INSERT INTO pilotes (id, user_id, is_recruteur) VALUES (1, 2, 0), (2, 3, 0), (3, 4, 0);
+-- -> Pilotes de l'école (2, 3, 4) + Recruteur d'entreprise (5)
+INSERT INTO users (id, nom, prenom, email, password, role_id, centre, entreprise_id) VALUES
+(2, 'MARTIN', 'Paul', 'paul.martin@cesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 2, 'Paris', NULL),
+(3, 'BERNARD', 'Lucie', 'lucie.bernard@cesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 2, 'Lyon', NULL),
+(4, 'THOMAS', 'Marc', 'marc.thomas@cesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 2, 'Bordeaux', NULL),
+(5, 'ROUSSEAU', 'Jacques', 'jacques.rousseau@techcorp.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 2, 'Paris', 1);
 
--- -> Création de 3 promotions, gérées par nos 3 pilotes
+-- Association dans la table pilotes (ID 5 est recruteur pour entreprise 1)
+INSERT INTO pilotes (id, user_id, is_recruteur, entreprise_id) VALUES 
+(1, 2, 0, NULL), 
+(2, 3, 0, NULL), 
+(3, 4, 0, NULL),
+(4, 5, 1, 1);
+
+-- -> Création de 3 promotions, gérées par nos 3 pilotes scolaires (Le recruteur n'y est pas)
 INSERT INTO ref_promotions (id, centre_id, nom) VALUES
 (1, 1, 'A2 Info Paris'), (2, 2, 'A2 Info Lyon'), (3, 3, 'A2 Info Bordeaux');
 INSERT INTO pilote_promotions (pilote_id, promotion_id) VALUES
 (2, 1), (3, 2), (4, 3);
 
 -- -> Étudiants (12 - 4 par promotion/pilote)
-INSERT INTO users (id, nom, prenom, email, password, role_id) VALUES
-(11, 'DURAND', 'Jean', 'jean.durand@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
-(12, 'LEROY', 'Marie', 'marie.leroy@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
-(13, 'MOREAU', 'Pierre', 'pierre.moreau@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
-(14, 'SIMON', 'Sophie', 'sophie.simon@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
+INSERT INTO users (id, nom, prenom, email, password, role_id, centre) VALUES
+(11, 'DURAND', 'Jean', 'jean.durand@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3, 'Paris'),
+(12, 'LEROY', 'Marie', 'marie.leroy@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3, 'Paris'),
+(13, 'MOREAU', 'Pierre', 'pierre.moreau@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3, 'Paris'),
+(14, 'SIMON', 'Sophie', 'sophie.simon@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3, 'Paris'),
 
-(15, 'LAURENT', 'Lucas', 'lucas.laurent@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
-(16, 'LEFEBVRE', 'Julie', 'julie.lefebvre@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
-(17, 'MICHEL', 'Hugo', 'hugo.michel@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
-(18, 'GARCIA', 'Chloe', 'chloe.garcia@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
+(15, 'LAURENT', 'Lucas', 'lucas.laurent@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3, 'Lyon'),
+(16, 'LEFEBVRE', 'Julie', 'julie.lefebvre@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3, 'Lyon'),
+(17, 'MICHEL', 'Hugo', 'hugo.michel@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3, 'Lyon'),
+(18, 'GARCIA', 'Chloe', 'chloe.garcia@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3, 'Lyon'),
 
-(19, 'DAVID', 'Leo', 'leo.david@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
-(20, 'BERTRAND', 'Emma', 'emma.bertrand@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
-(21, 'ROUX', 'Paul', 'paul.roux@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
-(22, 'VINCENT', 'Alice', 'alice.vincent@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3);
+(19, 'DAVID', 'Leo', 'leo.david@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3, 'Bordeaux'),
+(20, 'BERTRAND', 'Emma', 'emma.bertrand@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3, 'Bordeaux'),
+(21, 'ROUX', 'Paul', 'paul.roux@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3, 'Bordeaux'),
+(22, 'VINCENT', 'Alice', 'alice.vincent@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3, 'Bordeaux');
 
 INSERT INTO etudiants (user_id, promotion) VALUES
 (11, 'A2 Info Paris'), (12, 'A2 Info Paris'), (13, 'A2 Info Paris'), (14, 'A2 Info Paris'),
