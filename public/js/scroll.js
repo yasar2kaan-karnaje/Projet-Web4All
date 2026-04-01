@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     scrollTopBtn.style.fontSize = '20px';
     scrollTopBtn.style.cursor = 'pointer';
     scrollTopBtn.style.backgroundColor = 'var(--primary, #2A9D8F)';
-    scrollTopBtn.style.color = '#ffffff';
+    scrollTopBtn.style.color = '#0c0c0c';
     scrollTopBtn.style.border = 'none';
     scrollTopBtn.style.borderRadius = '50%';
     scrollTopBtn.style.boxShadow = '0 2px 5px rgba(0,0,0,0.3)';
