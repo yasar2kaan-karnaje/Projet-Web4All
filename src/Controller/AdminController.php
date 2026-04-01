@@ -396,7 +396,7 @@ class AdminController extends BaseController
     {
         $this->requireRole('admin', 'pilote');
         
-        $nom = htmlspecialchars(trim($_POST['nom'] ?? ''), ENT_QUOTES, 'UTF-8');
+        $nom = strip_tags(trim($_POST['nom'] ?? ''));
         $centreId = (int)($_POST['centre_id'] ?? 0);
         $role = $_SESSION['user']['role'];
         $centreNom = $_SESSION['user']['centre'] ?? null;
@@ -409,13 +409,14 @@ class AdminController extends BaseController
     public function centreCreate(): void
     {
         $this->requireRole('admin');
-        $nom = htmlspecialchars(trim($_POST['nom'] ?? ''), ENT_QUOTES, 'UTF-8');
+        $nom = strip_tags(trim($_POST['nom'] ?? ''));
         User::createCentre($nom);
         $this->redirect('/admin/promotions?success=Centre créé');
     }
 
     /**
-     * Sanitise rÃ©cursivement un tableau de donnÃ©es issues de $_POST.
+     * Sanitise récursivement un tableau de données issues de $_POST.
+     * Utiliser strip_tags et trim évite la corruption des accents et apostrophes dans la BD (&#039;).
      */
     private function sanitizePostData(array $data): array
     {
@@ -424,7 +425,9 @@ class AdminController extends BaseController
             if (is_array($value)) {
                 $sanitized[$key] = $this->sanitizePostData($value);
             } else {
-                $sanitized[$key] = htmlspecialchars(trim((string)$value), ENT_QUOTES, 'UTF-8');
+                // Utilise strip_tags au lieu de htmlspecialchars pour ne pas polluer la base de données
+                // Les requêtes PDO préparées protègent déjà de l'injection SQL
+                $sanitized[$key] = trim(strip_tags((string)$value));
             }
         }
         return $sanitized;

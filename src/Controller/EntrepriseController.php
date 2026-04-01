@@ -67,7 +67,7 @@ class EntrepriseController extends BaseController
 
         $note = (int) $this->postParam('note', 3);
         $note = max(1, min(5, $note)); // Assure que la note est entre 1 et 5
-        $commentaire = htmlspecialchars(trim((string)$this->postParam('commentaire', '')), ENT_QUOTES, 'UTF-8');
+        $commentaire = strip_tags(trim((string)$this->postParam('commentaire', '')));
 
         try {
             \App\Model\Entreprise::addEvaluation($_SESSION['user']['id'], (int) $id, $note, $commentaire);
