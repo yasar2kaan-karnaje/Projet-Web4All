@@ -369,18 +369,18 @@ INSERT INTO offres (id, titre, description, competences, remuneration, duree, li
 (14, 'DevOps', 'CI/CD et Docker', 'Docker, GitLab CI', '1350€/mois', '6 mois', 'Lyon', 5),
 (15, 'Architecte AWS', 'Design d architecture', 'AWS', '1500€/mois', '6 mois', 'Lyon', 5);
 
--- 6. Création des Utilisateurs avec le nouveau mot de passe
+-- 6. Création des Utilisateurs avec le nouveau mot de passe et noms formatés
 
 -- -> Administrateur (1)
 INSERT INTO users (id, nom, prenom, email, password, role_id) VALUES
-(1, 'Admin', 'Super', 'admin@test.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 1);
+(1, 'DUPONT', 'Super', 'super.dupont@test.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 1);
 INSERT INTO administrateurs (user_id) VALUES (1);
 
 -- -> Pilotes (3)
 INSERT INTO users (id, nom, prenom, email, password, role_id) VALUES
-(2, 'Martin', 'Paul', 'pilote1@cesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 2),
-(3, 'Bernard', 'Lucie', 'pilote2@cesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 2),
-(4, 'Thomas', 'Marc', 'pilote3@cesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 2);
+(2, 'MARTIN', 'Paul', 'paul.martin@cesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 2),
+(3, 'BERNARD', 'Lucie', 'lucie.bernard@cesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 2),
+(4, 'THOMAS', 'Marc', 'marc.thomas@cesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 2);
 INSERT INTO pilotes (id, user_id, is_recruteur) VALUES (1, 2, 0), (2, 3, 0), (3, 4, 0);
 
 -- -> Création de 3 promotions, gérées par nos 3 pilotes
@@ -391,20 +391,20 @@ INSERT INTO pilote_promotions (pilote_id, promotion_id) VALUES
 
 -- -> Étudiants (12 - 4 par promotion/pilote)
 INSERT INTO users (id, nom, prenom, email, password, role_id) VALUES
-(11, 'Etu1', 'Jean', 'etu1@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
-(12, 'Etu2', 'Marie', 'etu2@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
-(13, 'Etu3', 'Pierre', 'etu3@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
-(14, 'Etu4', 'Sophie', 'etu4@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
+(11, 'DURAND', 'Jean', 'jean.durand@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
+(12, 'LEROY', 'Marie', 'marie.leroy@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
+(13, 'MOREAU', 'Pierre', 'pierre.moreau@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
+(14, 'SIMON', 'Sophie', 'sophie.simon@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
 
-(15, 'Etu5', 'Lucas', 'etu5@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
-(16, 'Etu6', 'Julie', 'etu6@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
-(17, 'Etu7', 'Hugo', 'etu7@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
-(18, 'Etu8', 'Chloe', 'etu8@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
+(15, 'LAURENT', 'Lucas', 'lucas.laurent@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
+(16, 'LEFEBVRE', 'Julie', 'julie.lefebvre@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
+(17, 'MICHEL', 'Hugo', 'hugo.michel@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
+(18, 'GARCIA', 'Chloe', 'chloe.garcia@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
 
-(19, 'Etu9', 'Leo', 'etu9@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
-(20, 'Etu10', 'Emma', 'etu10@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
-(21, 'Etu11', 'Paul', 'etu11@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
-(22, 'Etu12', 'Alice', 'etu12@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3);
+(19, 'DAVID', 'Leo', 'leo.david@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
+(20, 'BERTRAND', 'Emma', 'emma.bertrand@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
+(21, 'ROUX', 'Paul', 'paul.roux@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3),
+(22, 'VINCENT', 'Alice', 'alice.vincent@viacesi.fr', '$2y$10$MqSusOQjdFYvRVx14PZud.GevvxLOgWspUAHdsi3FGPNX00b4PMfG', 3);
 
 INSERT INTO etudiants (user_id, promotion) VALUES
 (11, 'A2 Info Paris'), (12, 'A2 Info Paris'), (13, 'A2 Info Paris'), (14, 'A2 Info Paris'),
