@@ -1,0 +1,25 @@
+{
+  "name": "Dépi'Stage - Trouver un stage",
+  "short_name": "Dépi'Stage",
+  "description": "Plateforme web et mobile de recherche de stages pour étudiants CESI",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0056b3",
+  "icons": [
+    {
+      "src": "/logo/depistage.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/logo/depistage.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "orientation": "portrait-primary",
+  "scope": "/"
+}

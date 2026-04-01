@@ -7,7 +7,13 @@
     <title>{% block title %}Dépi'Stage{% endblock %}</title>
     <meta name="description" content="{% block description %}Dépi'Stage - Plateforme de recherche de stages pour étudiants CESI{% endblock %}">
     <meta name="keywords" content="{% block keywords %}stage, alternance, étudiant, CESI, ingénieur, entreprise, recrutement{% endblock %}">
-    <link rel="icon" type="image/png" href="/css/../logo/depistage.png">
+    
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="apple-touch-icon" href="/logo/depistage.png">
+    
+    <link rel="icon" type="image/png" href="/logo/depistage.png">
     <link rel="stylesheet" href="/css/styles.css">
     <link rel="stylesheet" href="/css/components.css">
     <link rel="stylesheet" href="/css/home.css">
@@ -163,6 +169,19 @@
     <script src="/js/validation.js"></script>
     <script src="/js/scroll.js"></script>
     <script src="/js/components.js"></script>
+
+    <!-- Enregistrement Service Worker PWA -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js').then(function(registration) {
+                    console.log('PWA ServiceWorker installé avec succès (scope: ', registration.scope, ')');
+                }, function(err) {
+                    console.log('Erreur d\'installation du ServiceWorker: ', err);
+                });
+            });
+        }
+    </script>
 </body>
 
 </html>
