@@ -37,6 +37,7 @@ Donnez les droits necessaires a Apache pour lire les fichiers :
 ```bash
 sudo chown -R www-data:www-data /var/www/depistage
 sudo chmod -R 755 /var/www/depistage
+sudo chmod -R 777 /var/www/depistage/uploads
 ```
 
 > Remplacez `<utilisateur>` par le nom du compte GitHub qui heberge le depot.
