@@ -75,6 +75,14 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
+    // Formatage global : Interdire les lettres dans les numéros de téléphone
+    document.querySelectorAll('input[type="tel"]').forEach(input => {
+        input.addEventListener('input', function() {
+            // Ne conserve que les chiffres, plus, espaces, points, tirets et parenthèses
+            this.value = this.value.replace(/[^\d\s\+\-\.\(\)]/g, '');
+        });
+    });
+
     if (cvForm) {
         const inputNom = document.getElementById('nom');
         const inputPrenom = document.getElementById('prenom');

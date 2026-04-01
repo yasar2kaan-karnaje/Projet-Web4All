@@ -40,15 +40,15 @@
                                     <td>{{ c.date_candidature|date('d/m/Y') }}</td>
                                     <td class="documents-cell">
                                         {% if c.cv_path %}
-                                            <a href="/download?f={{ c.cv_path }}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">📄 Mon CV</a>
+                                            <a href="{{ c.cv_path }}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">📄 Mon CV</a>
                                         {% else %}
                                             <span class="doc-missing">Pas de CV</span>
                                         {% endif %}
                                         {% if c.lettre_motivation %}
                                             {% if c.lettre_motivation starts with '/' %}
-                                                <a href="/download?f={{ c.lettre_motivation }}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">📄 Ma LM</a>
+                                                <a href="{{ c.lettre_motivation }}" target="_blank" rel="noopener" class="btn btn-outline btn-sm">📄 Ma LM</a>
                                             {% else %}
-                                                <button class="btn btn-outline btn-sm lm-toggle" data-lm-id="lm-{{ c.id }}">📝 Ma LM</button>
+                                                <button class="btn btn-outline btn-sm lm-toggle" data-lm-id="lm-{{ c.id }}"> Ma LM</button>
                                             {% endif %}
                                         {% endif %}
                                     </td>
@@ -110,7 +110,7 @@
     <div class="modal-overlay" id="lm-modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>📝 Lettre de Motivation</h3>
+                <h3> Lettre de Motivation</h3>
                 <button class="modal-close" id="modal-close">&times;</button>
             </div>
             <div class="modal-body lm-content" id="lm-modal-body"></div>
