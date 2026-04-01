@@ -310,13 +310,11 @@ class AdminController extends BaseController
         // Données pour le formulaire enrichi
         $allPromotions = User::getAllPromotions();
         $allCentres = User::getAllCentres();
-        $entreprisesResult = Entreprise::findAll(1, 1000);
 
         $this->render('admin/pilote_form.html.twig', [
             'user' => $pilote,
             'all_promotions' => $allPromotions,
             'all_centres' => $allCentres,
-            'entreprises' => $entreprisesResult['data'],
         ]);
     }
 
@@ -332,7 +330,6 @@ class AdminController extends BaseController
         }
 
         $data['role'] = 'pilote';
-        $data['is_recruteur'] = isset($data['is_recruteur']) ? 1 : 0;
         $data['updated_by'] = $_SESSION['user']['id'];
 
         // Traiter les promotions (checkboxes qui envoient des IDs)
@@ -358,7 +355,6 @@ class AdminController extends BaseController
         }
 
         $data['role'] = 'pilote';
-        $data['is_recruteur'] = isset($data['is_recruteur']) ? 1 : 0;
         $data['updated_by'] = $_SESSION['user']['id'];
 
         // Traiter les promotions

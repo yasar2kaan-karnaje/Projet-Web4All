@@ -11,7 +11,7 @@
             
             <div class="page-header" style="margin-top: 24px;">
                 <h1 class="page-title">{{ user ? 'Modifier le pilote' : 'Nouveau pilote' }}</h1>
-                <p class="page-subtitle">Gestion pédagogique & recruteur</p>
+                <p class="page-subtitle">Gestion pédagogique</p>
             </div>
 
             <div class="detail-section">
@@ -84,35 +84,6 @@
                         <small style="display: block; margin-bottom: 12px;">
                             <a href="/admin/promotions" target="_blank" style="color: var(--primary-color); font-weight: 600;">+ Créer une nouvelle promotion</a>
                         </small>
-                    </div>
-
-                    {# === EXTENSION RECRUTEUR === #}
-                    <h3 style="margin: 16px 0 0; padding-bottom: 8px; border-bottom: 2px solid var(--primary-color);">Extension Recruteur</h3>
-                    
-                    <div style="padding: 16px; background: var(--bg-hover); border-radius: 12px;">
-                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin-bottom: 16px;">
-                            <input type="checkbox" name="is_recruteur" value="1" 
-                                {% if user and user.is_recruteur %}checked{% endif %}
-                                id="toggle-recruteur"
-                                style="width: 20px; height: 20px; accent-color: var(--primary-color);">
-                            <span style="font-weight: 600;">Activer la casquette Recruteur</span>
-                        </label>
-                        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">
-                            Si activé, ce pilote pourra gérer les fiches entreprises et les offres en tant que recruteur.
-                        </p>
-
-                        <div id="recruteur-fields" style="{% if not user or not user.is_recruteur %}display: none;{% endif %}">
-                            <label for="entreprise_id" style="display: block; font-weight: 600; margin-bottom: 8px;">Entreprise associée</label>
-                            <select name="entreprise_id" id="entreprise_id" class="form-input form-select">
-                                <option value="">-- Aucune entreprise --</option>
-                                {% for e in entreprises %}
-                                    <option value="{{ e.id }}" {% if user and user.entreprise_id == e.id %}selected{% endif %}>
-                                        {{ e.nom }} ({{ e.localisation ?? 'N/A' }})
-                                    </option>
-                                {% endfor %}
-                            </select>
-                            <small style="color: var(--text-muted);">L'entreprise dont ce pilote-recruteur gère la fiche et les offres.</small>
-                        </div>
                     </div>
 
                     <div style="margin-top: 16px;">

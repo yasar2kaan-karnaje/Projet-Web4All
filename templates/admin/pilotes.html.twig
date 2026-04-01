@@ -34,7 +34,6 @@
                                 <th>Email</th>
                                 <th>Centre</th>
                                 <th>Promotions</th>
-                                <th>Recruteur</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -52,16 +51,6 @@
                                             {% endfor %}
                                         {% else %}
                                             <span style="color: var(--text-muted);">-</span>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if p.is_recruteur %}
-                                            <span class="status status-accepted">Recruteur</span>
-                                            {% if p.entreprise_nom %}
-                                                <br><small>{{ p.entreprise_nom }}</small>
-                                            {% endif %}
-                                        {% else %}
-                                            <span style="color: var(--text-muted);">Non</span>
                                         {% endif %}
                                     </td>
                                     <td style="display: flex; gap: 8px;">

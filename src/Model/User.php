@@ -4,25 +4,34 @@ namespace App\Model;
 
 use PDO;
 
-class User {
+class User
+{
+    // ===================================
+    // REQUÊTES DE BASE (SELECT)
+    // ===================================
 
-    //Renvoie en string la requete SQL de tous les champs de users + les champs spécifiques au rôle    
-    private static function baseSelectQuery(): string {
+    /**
+     * Requête SELECT de base avec JOINs sur les sous-tables
+     * Renvoie tous les champs de users + les champs spécifiques au rôle
+     */
+    private static function baseSelectQuery(): string
+    {
         return "SELECT u.*, r.nom AS role, r.label AS role_label,
                        et.promotion,
-                       p.is_recruteur, p.entreprise_id, ent.nom AS entreprise_nom,
                        updater.nom AS updated_by_nom, updater.prenom AS updated_by_prenom
                 FROM users u
                 JOIN roles r ON u.role_id = r.id
                 LEFT JOIN etudiants et ON u.id = et.user_id
                 LEFT JOIN pilotes p ON u.id = p.user_id
                 LEFT JOIN administrateurs a ON u.id = a.user_id
-                LEFT JOIN entreprises ent ON p.entreprise_id = ent.id
                 LEFT JOIN users updater ON u.updated_by = updater.id";
     }
 
-    //Trouve un utilisateur par email et renvoie le tableau des infos du users
-    public static function findByEmail(string $email): ?array {
+    /**
+     * Trouve un utilisateur par email (login)
+     */
+    public static function findByEmail(string $email): ?array
+    {
         $db = Database::getInstance();
         $sql = self::baseSelectQuery() . " WHERE u.email = :email";
         $stmt = $db->prepare($sql);
@@ -31,8 +40,11 @@ class User {
         return $user ?: null;
     }
 
-    //Trouve un utilisateur par ID (avec ses promotions si pilote) et renvoie le tableau
-    public static function findById(int $id): ?array {
+    /**
+     * Trouve un utilisateur par ID (avec ses promotions si pilote)
+     */
+    public static function findById(int $id): ?array
+    {
         $db = Database::getInstance();
         $sql = self::baseSelectQuery() . " WHERE u.id = :id";
         $stmt = $db->prepare($sql);
@@ -50,8 +62,11 @@ class User {
         return $user;
     }
 
-    //Récupère tous les utilisateurs d'un rôle donné avec pagination et les mets dans un tableau
-    public static function findByRole(string $role, int $page = 1, int $perPage = 10, string $search = ''): array {
+    /**
+     * Récupère tous les utilisateurs d'un rôle donné avec pagination
+     */
+    public static function findByRole(string $role, int $page = 1, int $perPage = 10, string $search = ''): array
+    {
         $db = Database::getInstance();
         $offset = ($page - 1) * $perPage;
 
@@ -78,10 +93,8 @@ class User {
                     JOIN roles r ON u.role_id = r.id
                     JOIN etudiants et ON u.id = et.user_id
                     $where ORDER BY u.nom ASC LIMIT :limit OFFSET :offset";
-        }
-        elseif ($role === 'pilote') {
+        } elseif ($role === 'pilote') {
             $sql = "SELECT u.*, r.nom AS role, r.label AS role_label, 
-                    p.is_recruteur, p.entreprise_id, ent.nom AS entreprise_nom,
                     (SELECT GROUP_CONCAT(rp.nom SEPARATOR ', ') 
                      FROM pilote_promotions pp 
                      JOIN ref_promotions rp ON pp.promotion_id = rp.id 
@@ -89,10 +102,8 @@ class User {
                     FROM users u 
                     JOIN roles r ON u.role_id = r.id
                     JOIN pilotes p ON u.id = p.user_id
-                    LEFT JOIN entreprises ent ON p.entreprise_id = ent.id
                     $where ORDER BY u.nom ASC LIMIT :limit OFFSET :offset";
-        }
-        else {
+        } else {
             $sql = "SELECT u.*, r.nom AS role, r.label AS role_label 
                     FROM users u 
                     JOIN roles r ON u.role_id = r.id 
@@ -115,8 +126,11 @@ class User {
         ];
     }
 
-    //Récupère les étudiants visibles par un pilote (filtrage par centre + promotions)
-    public static function findStudentsByPilote(int $piloteId, int $page = 1, int $perPage = 10, string $search = ''): array {
+    /**
+     * Récupère les étudiants visibles par un pilote (filtrage par centre + promotions)
+     */
+    public static function findStudentsByPilote(int $piloteId, int $page = 1, int $perPage = 10, string $search = ''): array
+    {
         $db = Database::getInstance();
         $offset = ($page - 1) * $perPage;
 
@@ -184,8 +198,15 @@ class User {
         ];
     }
 
-    //Crée un utilisateur + sa ligne dans la sous-table du rôle renvoie son ID
-    public static function create(array $data): int {
+    // ===================================
+    // CRUD
+    // ===================================
+
+    /**
+     * Crée un utilisateur + sa ligne dans la sous-table du rôle
+     */
+    public static function create(array $data): int
+    {
         $db = Database::getInstance();
 
         // Résoudre le role_id
@@ -222,20 +243,16 @@ class User {
                 'user_id' => $userId,
                 'promotion' => $data['promotion'] ?? null,
             ]);
-        }
-        elseif ($roleName === 'pilote') {
-            $stmtSub = $db->prepare('INSERT INTO pilotes (user_id, is_recruteur, entreprise_id) VALUES (:user_id, :is_recruteur, :entreprise_id)');
+        } elseif ($roleName === 'pilote') {
+            $stmtSub = $db->prepare('INSERT INTO pilotes (user_id) VALUES (:user_id)');
             $stmtSub->execute([
                 'user_id' => $userId,
-                'is_recruteur' => (int) ($data['is_recruteur'] ?? 0),
-                'entreprise_id' => !empty($data['entreprise_id']) ? (int) $data['entreprise_id'] : null,
             ]);
             // Sauvegarder les promotions pilote
             if (!empty($data['promotions'])) {
                 self::setPilotePromotionsId($userId, $data['promotions']);
             }
-        }
-        elseif ($roleName === 'admin') {
+        } elseif ($roleName === 'admin') {
             $stmtSub = $db->prepare('INSERT INTO administrateurs (user_id) VALUES (:user_id)');
             $stmtSub->execute(['user_id' => $userId]);
         }
@@ -243,8 +260,11 @@ class User {
         return $userId;
     }
 
-    //Met à jour un utilisateur + sa sous-table renvoie un bool
-    public static function update(int $id, array $data): bool {
+    /**
+     * Met à jour un utilisateur + sa sous-table
+     */
+    public static function update(int $id, array $data): bool
+    {
         $db = Database::getInstance();
 
         // --- Mise à jour de la table users ---
@@ -265,8 +285,7 @@ class User {
                 $fields[] = 'role_id = :role_id';
                 $params['role_id'] = $roleId;
             }
-        }
-        elseif (isset($data['role_id'])) {
+        } elseif (isset($data['role_id'])) {
             $fields[] = 'role_id = :role_id';
             $params['role_id'] = (int) $data['role_id'];
         }
@@ -309,28 +328,11 @@ class User {
                 ]);
             }
         } elseif ($roleName === 'pilote') {
-            $subFields = [];
-            $subParams = ['user_id' => $id];
-
-            if (array_key_exists('is_recruteur', $data)) {
-                $subFields[] = 'is_recruteur = :is_recruteur';
-                $subParams['is_recruteur'] = (int) $data['is_recruteur'];
-            }
-            if (array_key_exists('entreprise_id', $data)) {
-                $subFields[] = 'entreprise_id = :entreprise_id';
-                $subParams['entreprise_id'] = !empty($data['entreprise_id']) ? (int) $data['entreprise_id'] : null;
-            }
-
-            if (!empty($subFields)) {
-                // S'assurer que la ligne existe
-                $stmtCheck = $db->prepare('SELECT COUNT(*) FROM pilotes WHERE user_id = :uid');
-                $stmtCheck->execute(['uid' => $id]);
-                if ((int)$stmtCheck->fetchColumn() === 0) {
-                    $db->prepare('INSERT INTO pilotes (user_id) VALUES (:uid)')->execute(['uid' => $id]);
-                }
-                $sqlSub = 'UPDATE pilotes SET ' . implode(', ', $subFields) . ' WHERE user_id = :user_id';
-                $stmtSub = $db->prepare($sqlSub);
-                $stmtSub->execute($subParams);
+            // S'assurer que la ligne existe
+            $stmtCheck = $db->prepare('SELECT COUNT(*) FROM pilotes WHERE user_id = :uid');
+            $stmtCheck->execute(['uid' => $id]);
+            if ((int)$stmtCheck->fetchColumn() === 0) {
+                $db->prepare('INSERT INTO pilotes (user_id) VALUES (:uid)')->execute(['uid' => $id]);
             }
 
             // Mettre à jour les promotions si fournies
@@ -338,18 +340,29 @@ class User {
                 self::setPilotePromotionsId($id, $data['promotions']);
             }
         }
+
         return $result;
     }
 
-    //Supprime un utilisateur (CASCADE supprime la sous-table)
-    public static function delete(int $id): bool {
+    /**
+     * Supprime un utilisateur (CASCADE supprime la sous-table)
+     */
+    public static function delete(int $id): bool
+    {
         $db = Database::getInstance();
         $stmt = $db->prepare('DELETE FROM users WHERE id = :id');
         return $stmt->execute(['id' => $id]);
     }
 
-    //Vérifie le mot de passe et renvoie le tableau du user si c'est bon
-    public static function verifyPassword(string $email, string $password): ?array {
+    // ===================================
+    // AUTHENTIFICATION
+    // ===================================
+
+    /**
+     * Vérifie le mot de passe
+     */
+    public static function verifyPassword(string $email, string $password): ?array
+    {
         $user = self::findByEmail($email);
         if ($user && password_verify($password, $user['password'])) {
             return $user;
@@ -357,15 +370,28 @@ class User {
         return null;
     }
 
-    //Compte les utilisateurs par rôle et revnoie le nombre
-    public static function countByRole(string $role): int {
+    // ===================================
+    // COMPTEURS
+    // ===================================
+
+    /**
+     * Compte les utilisateurs par rôle
+     */
+    public static function countByRole(string $role): int
+    {
         $db = Database::getInstance();
         $stmt = $db->prepare('SELECT COUNT(*) FROM users u JOIN roles r ON u.role_id = r.id WHERE r.nom = :role');
         $stmt->execute(['role' => $role]);
         return (int) $stmt->fetchColumn();
     }
 
-    //Récupère les promotions d'un pilote
+    // ===================================
+    // GESTION DES PROMOTIONS PILOTE
+    // ===================================
+
+    /**
+     * Récupère les promotions d'un pilote
+     */
     public static function getPilotePromotions(int $piloteId): array
     {
         $db = Database::getInstance();
