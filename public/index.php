@@ -58,6 +58,7 @@ $router->get('/etudiant/wishlist', [WishlistController::class, 'index']);
 $router->post('/wishlist/add', [WishlistController::class, 'add']);
 $router->post('/wishlist/remove', [WishlistController::class, 'remove']);
 $router->post('/entreprise/{id}/evaluer', [EntrepriseController::class, 'evaluer']);
+$router->get('/download', [CandidatureController::class, 'telechargerDocument']);
 
 // =============================================
 // Routes pilote

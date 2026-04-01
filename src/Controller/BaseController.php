@@ -47,7 +47,10 @@ class BaseController
             $token = $_POST['csrf_token'] ?? '';
             if (!hash_equals($_SESSION['csrf_token'], $token)) {
                 http_response_code(403);
-                die("Erreur de sécurité CSRF : Jeton invalide ou expiré. Veuillez rafraîchir la page et réessayer.");
+                echo $this->twig->render('errors/403.html.twig', [
+                    'error_msg' => "Erreur de sécurité CSRF : Jeton invalide ou expiré. Veuillez retourner en arrière, rafraîchir la page et réessayer."
+                ]);
+                exit;
             }
         }
 

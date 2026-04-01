@@ -92,26 +92,56 @@ class OffreController extends BaseController
 
             // Upload du CV
             $cvPath = null;
-            if (isset($_FILES['cv']) && $_FILES['cv']['error'] === UPLOAD_ERR_OK) {
-                $uploadDir = __DIR__ . '/../../public/uploads/cv/';
+            if (isset($_FILES['cv']) && $_FILES['cv']['size'] > 0) {
+                if ($_FILES['cv']['error'] !== UPLOAD_ERR_OK) {
+                    throw new \Exception("Erreur upload CV (Code: " . $_FILES['cv']['error'] . "). Fichier peut-être trop volumineux.");
+                }
+                $uploadDir = __DIR__ . '/../../uploads/cv/';
                 if (!is_dir($uploadDir)) {
-                    mkdir($uploadDir, 0755, true);
+                    if (!@mkdir($uploadDir, 0777, true)) {
+                        throw new \Exception("Dossier upload CV inaccessible. Problème de droits sur le serveur.");
+                    }
                 }
                 $filename = uniqid() . '_' . basename($_FILES['cv']['name']);
-                move_uploaded_file($_FILES['cv']['tmp_name'], $uploadDir . $filename);
-                $cvPath = '/uploads/cv/' . $filename;
+                if (move_uploaded_file($_FILES['cv']['tmp_name'], $uploadDir . $filename)) {
+                    chmod($uploadDir . $filename, 0644);
+                    $cvPath = '/uploads/cv/' . $filename;
+                } else {
+                    throw new \Exception("Enregistrement du CV refusé par le serveur. Permissions bloquées.");
+                }
+            }
+
+            // Upload de la Lettre de motivation (LM)
+            $lmPath = null;
+            if (isset($_FILES['lettre_motivation']) && $_FILES['lettre_motivation']['size'] > 0) {
+                if ($_FILES['lettre_motivation']['error'] !== UPLOAD_ERR_OK) {
+                    throw new \Exception("Erreur upload LM (Code: " . $_FILES['lettre_motivation']['error'] . "). Fichier peut-être trop volumineux.");
+                }
+                $uploadDirLm = __DIR__ . '/../../uploads/lm/';
+                if (!is_dir($uploadDirLm)) {
+                    if (!@mkdir($uploadDirLm, 0777, true)) {
+                        throw new \Exception("Dossier upload LM inaccessible. Problème de droits sur le serveur.");
+                    }
+                }
+                $filenameLm = uniqid() . '_' . basename($_FILES['lettre_motivation']['name']);
+                if (move_uploaded_file($_FILES['lettre_motivation']['tmp_name'], $uploadDirLm . $filenameLm)) {
+                    chmod($uploadDirLm . $filenameLm, 0644);
+                    $lmPath = '/uploads/lm/' . $filenameLm;
+                } else {
+                    throw new \Exception("Enregistrement de la LM refusé par le serveur. Permissions bloquées.");
+                }
             }
 
             Candidature::create([
                 'user_id' => $userId,
                 'offre_id' => $offreId,
                 'cv_path' => $cvPath,
-                'lettre_motivation' => $this->postParam('lettre_motivation', ''),
+                'lettre_motivation' => $lmPath ?? $this->postParam('lettre_motivation', ''),
             ]);
 
             $this->redirect('/etudiant/candidatures?success=Candidature envoyée avec succès');
         } catch (\Exception $e) {
-            $this->redirect('/offre/' . $id . '?error=Erreur lors de l\'envoi');
+            $this->redirect('/offre/' . $id . '?error=' . urlencode($e->getMessage()));
         }
     }
 }

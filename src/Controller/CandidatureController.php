@@ -55,4 +55,38 @@ class CandidatureController extends BaseController
             'statut' => $statut,
         ]);
     }
+
+    /**
+     * Télécharger un document (CV ou LM)
+     * Protège et sert le fichier via PHP pour éviter les erreurs Forbidden d'Apache
+     */
+    public function telechargerDocument(): void
+    {
+        $this->requireLogin();
+        $file = $this->getParam('f');
+        if (!$file) {
+            http_response_code(400);
+            die("Fichier non spécifié.");
+        }
+
+        // Sécurité de base: interdir l'accès hors dossier public/uploads
+        if (strpos($file, '/uploads/') !== 0 || strpos($file, '..') !== false) {
+            http_response_code(403);
+            die("Accès refusé.");
+        }
+
+        $absolutePath = __DIR__ . '/../..' . $file;
+        if (!file_exists($absolutePath) || !is_file($absolutePath)) {
+            http_response_code(404);
+            die("Fichier introuvable.");
+        }
+
+        $mimeType = mime_content_type($absolutePath) ?: 'application/octet-stream';
+        
+        header('Content-Type: ' . $mimeType);
+        header('Content-Disposition: inline; filename="' . basename($absolutePath) . '"');
+        header('Content-Length: ' . filesize($absolutePath));
+        readfile($absolutePath);
+        exit;
+    }
 }

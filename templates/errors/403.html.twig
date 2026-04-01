@@ -15,8 +15,12 @@
             </div>
             <h1 class="error-title">Accès refusé</h1>
             <p class="error-message">
-                Vous n'avez pas les droits nécessaires pour accéder à cette page.<br>
-                Si vous pensez qu'il s'agit d'une erreur, contactez votre pilote de promotion.
+                {% if error_msg %}
+                    {{ error_msg }}
+                {% else %}
+                    Vous n'avez pas les droits nécessaires pour accéder à cette page.<br>
+                    Si vous pensez qu'il s'agit d'une erreur, contactez votre pilote de promotion.
+                {% endif %}
             </p>
             <div class="error-actions">
                 <a href="/" class="btn btn-primary btn-lg">Retour à l'accueil</a>

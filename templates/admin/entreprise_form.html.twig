@@ -39,7 +39,7 @@
                         </div>
                         <div style="flex: 1;">
                             <label for="tel_contact" style="display: block; font-weight: 600; margin-bottom: 8px;">Téléphone de contact</label>
-                            <input type="text" id="tel_contact" name="tel_contact" class="form-input" value="{{ entreprise.tel_contact ?? '' }}">
+                            <input type="tel" id="tel_contact" name="tel_contact" class="form-input" value="{{ entreprise.tel_contact ?? '' }}" pattern="^(?:(?:\+|00)33[\s.-]{0,3}(?:\(0\)[\s.-]{0,3})?|0)[1-9](?:(?:[\s.-]?\d{2}){4}|\d{2}(?:[\s.-]?\d{3}){2})$" title="Numéro de téléphone valide requis">
                         </div>
                     </div>
 

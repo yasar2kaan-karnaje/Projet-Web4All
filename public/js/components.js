@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 var identifiantLm = this.dataset.lmId;
                 var donneesLettre = document.getElementById(identifiantLm);
                 if (donneesLettre) {
-                    corpsModale.textContent = donneesLettre.textContent;
+                    corpsModale.innerHTML = donneesLettre.innerHTML;
                     boiteModale.classList.add('show');
                 }
             });

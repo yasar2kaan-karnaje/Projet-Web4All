@@ -13,6 +13,40 @@ document.addEventListener('DOMContentLoaded', function() {
                     firstInvalid.classList.add('input-error');
                 }
             }
+
+            // Custom validation for number inputs
+            const numberInputs = form.querySelectorAll('input[type="number"]');
+            numberInputs.forEach(input => {
+                if (input.value !== '' && isNaN(Number(input.value))) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    input.classList.add('is-invalid');
+                }
+            });
+
+            // Custom validation for date inputs
+            const dateInputs = form.querySelectorAll('input[type="date"]');
+            dateInputs.forEach(input => {
+                if (input.value !== '') {
+                    const date = new Date(input.value);
+                    if (isNaN(date.getTime())) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        input.classList.add('is-invalid');
+                    }
+                }
+            });
+
+            // Custom validation for tel inputs
+            const telInputs = form.querySelectorAll('input[type="tel"]');
+            telInputs.forEach(input => {
+                const telRegex = /^(?:(?:\+|00)33[\s.-]{0,3}(?:\(0\)[\s.-]{0,3})?|0)[1-9](?:(?:[\s.-]?\d{2}){4}|\d{2}(?:[\s.-]?\d{3}){2})$/;
+                if (input.value !== '' && !telRegex.test(input.value.replace(/\s/g, ''))) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    input.classList.add('is-invalid');
+                }
+            });
             form.classList.add('was-validated');
         }, false);
     });
@@ -46,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const inputPrenom = document.getElementById('prenom');
         const inputCourriel = document.getElementById('courriel');
         const inputCv = document.getElementById('cv');
-        const inputMessage = document.getElementById('message_recruteur');
+        const inputLm = document.getElementById('lettre_motivation');
 
         cvForm.addEventListener('submit', function(e) {
             let isCvValid = true;
@@ -71,7 +105,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Vérifications
             validateRequired(inputNom);
             validateRequired(inputPrenom);
-            validateRequired(inputMessage);
 
             if (inputCourriel) {
                 // Regex basique pour email
@@ -97,6 +130,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             } else if (inputCv && inputCv.files.length === 0) {
                 showError(inputCv, true);
+            }
+
+            if (inputLm && inputLm.files.length > 0) {
+                const file = inputLm.files[0];
+                const validExtensions = ['pdf', 'doc', 'docx', 'odt', 'rtf'];
+                const fileExtension = file.name.split('.').pop().toLowerCase();
+                const maxSize = 2 * 1024 * 1024; // 2 Mo
+
+                if (!validExtensions.includes(fileExtension) || file.size > maxSize) {
+                    showError(inputLm, true);
+                } else {
+                    showError(inputLm, false);
+                }
             }
 
             if (!isCvValid) {
